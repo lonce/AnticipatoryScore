@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/appstyle.css">
+        <title>messaging demo</title>
+        <meta name="description" content="action messaging">
+        <script type="text/javascript" data-main="appscripts/main.js" src="jslibs/require.js"></script>
+    </head>
+    <body >
+    <div id="wrapper">
+
+
+
+
+
+
+
+        <div id="app">
+            <h3> Shared Scrolling "Anticipatory" Score </h3><br>
+            <div id="test_intro">  
+            Join a room to share your sonic scribbles with others. Tested with Chrome and Safari on Macs, PCs, Andoird, tablets, and phones. <br>
+            If your device is not webAudio enabled, you can still be a "remote controller" in the space - to listen, just be within earshot of a webAudio device with a browser pointed to the same room.            
+            <br>
+            The server is in the States.
+            </div>
+            <div id="display">
+                <div id="timeLabelDiv">
+                    Time 
+                </div>
+                <div id="timeDisplayDiv">
+            	   Time 
+                </div>
+                <div id="app">
+
+
+
+                <span id="slider_area">
+                    (w)
+                    <canvas id="slidercanvas1"></canvas>
+                    (x)
+                </span>   
+
+                <span id="scoreSpan">
+                    <canvas id="score"></canvas>
+                </span>
+
+
+                <span id="radioSelect">
+                    <div id="radioSelectDiv">
+                       Input type:<br>
+                       <div>
+                        <input type="radio"  name="radioSelect"  id="radioSpray" value="spray">Event Spray<br>
+                        </div>
+                        <div>
+                            <input type="radio"  name="radioSelect" id="radioContour" value="contour">Contour<br>
+                        </div>
+                        <div>
+                            <input type="radio"  name="radioSelect" id="radioPitch" value="pitch">Pitch<br>
+                        </div>
+                    </div>
+                </span>
+
+
+                <span>
+                    <div class="myTabs" id="pitchTab">
+                    <table border="1">
+                    <tr>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio1" value="1"/>
+                        <label for="pradio1">c3</label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio2" value="2"/>
+                        <label for="pradio2">c3# </label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio3" value="3"/>
+                        <label for="pradio3">d3  </label>
+                        </td>
+                    </tr>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio4" value="4"/>
+                        <label for="pradio4">d3# </label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio5" value="5"/>
+                        <label for="pradio5">e3  </label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio6" value="6"/>
+                        <label for="pradio6">f3  </label>
+                        </td>
+                    </tr>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio7" value="7"/>
+                        <label for="pradio7">f3# </label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio8" value="8"/>
+                        <label for="pradio8">g3  </label>
+                        </td>
+                        <td>
+                        <input type="radio" name="pradio" id="pradio9" value="9"/>
+                        <label for="pradio9">g3# </label>
+                        </td>
+                    </tr>
+                    </table>
+                    </div>
+                <span>
+
+
+                 <div class="myTabs" id="contourTab">
+                    contour tab
+                </div>
+                <div class="myTabs" id="sprayTab">
+                    spray tab
+                </div>
+            </span>
+
+
+ 
+
+
+ 
+                </div>
+
+            <div id="control_section">
+                Join a room:
+                <select id="roomList">
+                    <option></option>
+                    <option>defaultRoom</option>
+                </select>
+                <div id="room_textbox">
+                    <p>You are in room: <input type="text" id="current_room" size="20"></p>
+                </div>
+
+            </div><!-- display -->
+            </div>  
+         </div>
+    </body>
+</html>
+
