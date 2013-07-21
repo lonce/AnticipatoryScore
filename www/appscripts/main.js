@@ -61,6 +61,8 @@ require(
 		var m_lastSprayEvent = 0; // time (rel origin) of the last spray event (not where on the score, but when it happened. 
 
 
+		var m_playState={}; // keeps track of the last display element of a given type to cross the "now" line. 		
+
 		//---------------------------------------------------------------------------
 		// init is called just after a client navigates to the web page
 		// 	data[0] is the client number we are assigned by the server.
@@ -282,18 +284,26 @@ require(
 			//------------		
 			// Draw the musical display elements 
 			var t_end; 
+			var dispe;	
 			for(dispElmt=displayElements.length-1;dispElmt>=0;dispElmt--){ // run through in reverse order so we can splice the array to remove long past elements
-
+				dispe = displayElements[dispElmt];	
 
 				// If its moved out of our score window, delete it from the display list
 				t_end=time2Px(displayElements[dispElmt].e);
 
-				if (t_end < pastLinePx) {
+				// if you are history and are not the current state element of your type, say goodbye
+				if (t_end < pastLinePx){
+					 if (m_playState[displayElements[dispElmt].type] === displayElements[dispElmt]){
+					 	dispe.drawAtPixel && dispe.drawAtPixel(context, 0);
+
+					 } else{
 					// remove event from display list
-					displayElements.splice(dispElmt,1);
+						displayElements.splice(dispElmt,1);
+						console.log("removing element from display list");
+					}
 				} else{
 
-					var dispe = displayElements[dispElmt];	
+					
 
 					//console.log("draw event of type " + dispe.type);				
 					dispe.draw(context, time2Px, nowishP);
@@ -302,6 +312,9 @@ require(
 					// If element is just crossing the "now" line, create little visual explosion
 					if (nowishP(dispe.d[0][0])){					
 						explosion(time2Px(dispe.d[0][0]), dispe.d[0][1], 5, "#FF0000", 3, "#FFFFFF");
+
+						m_playState[dispe.type]=dispe;
+						console.log(dispe.type + " has a new state element");
 
 					} 
 				}
