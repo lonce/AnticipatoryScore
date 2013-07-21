@@ -183,7 +183,7 @@ require(
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pxPerSec=pixelShiftPerMs*1000;
 		var nowLinePx=theCanvas.width/3;
-		var pastLinePx=-20; // after which we delete the display elements
+		var pastLinePx=0; // after which we delete the display elements
 
 		var sprocketHeight=2;
 		var sprocketWidth=1;
@@ -284,14 +284,17 @@ require(
 			//------------		
 			// Draw the musical display elements 
 			var t_end; 
+			var t_beg;
 			var dispe;	
 			for(dispElmt=displayElements.length-1;dispElmt>=0;dispElmt--){ // run through in reverse order so we can splice the array to remove long past elements
 				dispe = displayElements[dispElmt];	
 
+
 				// If its moved out of our score window, delete it from the display list
 				t_end=time2Px(displayElements[dispElmt].e);
 
-				// if you are history and are not the current state element of your type, say goodbye
+
+				// if you are the current play state element of your type
 				if (t_end < pastLinePx){
 					 if (m_playState[displayElements[dispElmt].type] === displayElements[dispElmt]){
 					 	dispe.drawAtPixel && dispe.drawAtPixel(context, 0);
@@ -302,8 +305,6 @@ require(
 						console.log("removing element from display list");
 					}
 				} else{
-
-					
 
 					//console.log("draw event of type " + dispe.type);				
 					dispe.draw(context, time2Px, nowishP);
@@ -318,6 +319,15 @@ require(
 
 					} 
 				}
+
+				// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
+				if (m_playState[displayElements[dispElmt].type] != displayElements[dispElmt]){
+					if (t_end< nowLinePx){
+						displayElements.splice(dispElmt,1);
+						continue;
+					}
+				}
+
 			}
 
 			// draw the "now" line
