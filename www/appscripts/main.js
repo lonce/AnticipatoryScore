@@ -14,12 +14,9 @@ require.config({
 	}
 });
 require(
-	["require", "comm", "utils", "touch2Mouse", "canvasSlider", "soundbank", "scoreEvents/pitchEvent", "scoreEvents/rhythmEvent", "scoreEvents/chordEvent",  "scoreEvents/contourEvent", "scoreEvents/sprayEvent", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "config"],
+	["require", "comm", "utils", "touch2Mouse", "canvasSlider2", "soundbank", "scoreEvents/pitchEvent", "scoreEvents/rhythmEvent", "scoreEvents/chordEvent",  "scoreEvents/contourEvent", "scoreEvents/sprayEvent", "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "config"],
 
-	function (require, comm, utils, touch2Mouse, canvasSlider, soundbank, pitchEvent, rhythmEvent, chordEvent, contourEvent, sprayEvent, pitchTabFactory, rhythmTabFactory, chordTabFactory, config) {
-
-
-
+	function (require, comm, utils, touch2Mouse, canvasSlider, soundbank, pitchEvent, rhythmEvent, chordEvent, contourEvent, sprayEvent, tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, config) {
 
 		if(config.webketAudioEnabled){
 			soundbank.create(12); // max polyphony 
@@ -50,50 +47,15 @@ require(
 		var k_minLineThickness=1;
 		var k_maxLineThickness=16; // actually, max will be k_minLineThickness + k_maxLineThickness
 
-		var leftSlider = canvasSlider(window,"slidercanvas1");
-		var radioSpray = window.document.getElementById("radioSpray"); 
-		var radioContour = window.document.getElementById("radioContour");
-		var radioPitch = window.document.getElementById("radioPitch");
-		var radioRhythm = window.document.getElementById("radioRhythm");
-		var radioChord = window.document.getElementById("radioChord");
+		var leftSlider = canvasSlider("slidercanvas1");
 
-		var radioSelection = "contour"; // by default
 
-		radioSpray.onclick=function(){
-			radioSelection = this.value;
-			setTab("sprayTab");
-		};
-		radioContour.onclick=function(){
-			radioSelection = this.value;
-			setTab("contourTab");
-		};
-		radioPitch.onclick=function(){
-			radioSelection = this.value;
-			setTab("pitchTab");
-		};
-		radioRhythm.onclick=function(){
-			radioSelection = this.value;
-			setTab("rhythmTab");
-		};
-		radioChord.onclick=function(){
-			radioSelection = this.value;
-			setTab("chordTab");
-		};
-
-		//radioContour.addEventListener("onclick", function(){console.log("radio Contour");});
-		var setTab=function(showTab){
-			window.document.getElementById("contourTab").style.display="none";
-			window.document.getElementById("sprayTab").style.display="none";
-			window.document.getElementById("pitchTab").style.display="none";
-			window.document.getElementById("rhythmTab").style.display="none";
-			window.document.getElementById("chordTab").style.display="none";
-
-			window.document.getElementById(showTab).style.display="inline-block";
-		}
-
+		// Create the tabPanes
 		var m_pTab=pitchTabFactory();
 		var m_rTab=rhythmTabFactory();
 		var m_cTab=chordTabFactory();
+
+		var m_tabTab=tabTab(); // the tabs for the panes
 
 		var k_sprayPeriod = 20;// ms between sprayed events
 		var m_lastSprayEvent = 0; // time (rel origin) of the last spray event (not where on the score, but when it happened. 
@@ -322,6 +284,7 @@ require(
 			var t_end; 
 			for(dispElmt=displayElements.length-1;dispElmt>=0;dispElmt--){ // run through in reverse order so we can splice the array to remove long past elements
 
+
 				// If its moved out of our score window, delete it from the display list
 				t_end=time2Px(displayElements[dispElmt].e);
 
@@ -383,9 +346,12 @@ require(
 		function initiateContour(x, y){
 			var z = k_minLineThickness + k_maxLineThickness*leftSlider.value;
 			// time at the "now" line + the distance into the future or past 
-			var t = Date.now()-timeOrigin + px2Time(x);			
+			var t = Date.now()-timeOrigin + px2Time(x);		
 
-			if (radioSelection==='contour'){
+			var radioSelection=m_tabTab.currentSelection();
+ 	
+
+			if (radioSelection==="Contour"){
 				//current_mgesture={type: 'mouseContourGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=contourEvent();
 				current_mgesture.d=[[t,y,z]];
@@ -401,7 +367,7 @@ require(
 
 			} 
 
-			if (radioSelection==='spray'){
+			if (radioSelection==="Spray"){
 				//current_mgesture={type: 'mouseEventGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=sprayEvent();
 				current_mgesture.d=[[t,y,z]];
@@ -417,7 +383,7 @@ require(
 				displayElements.push(current_mgesture);
 			} 
 
-			if (radioSelection==='pitch'){
+			if (radioSelection==="Pitch"){
 				current_mgesture=pitchEvent(m_pTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;
@@ -425,7 +391,7 @@ require(
 				displayElements.push(current_mgesture);
 			}
 
-			if (radioSelection==='rhythm'){
+			if (radioSelection==="Rhythm"){
 				current_mgesture=rhythmEvent(m_rTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;
@@ -433,7 +399,7 @@ require(
 				displayElements.push(current_mgesture);
 			}
 
-			if (radioSelection==='chord'){
+			if (radioSelection==="Chord"){
 				current_mgesture=chordEvent(m_cTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;
@@ -545,13 +511,6 @@ require(
 				comm.sendJSONmsg("startTime", []);
 			} 
    		 })
-
-		// INITIALIZATIONS --------------------
-		radioContour.checked=true; // initialize
-		setTab("contourTab");
-
-
-
 
 	}
 );

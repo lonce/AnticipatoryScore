@@ -126,7 +126,7 @@ text-align:center;
   Hide radio button (the round disc)
   we will use just the label to create pushbutton effect
 */
-input[name=radioSelect] {
+input[name=tabTab] {
     display:none; 
     margin:10px;
 }
@@ -134,7 +134,7 @@ input[name=radioSelect] {
   Change the look'n'feel of labels (which are adjacent to radiobuttons).
   Add some margin, padding to label
 */
-input[name=radioSelect] + label {
+input[name=tabTab] + label {
     display:inline-block;
     margin: 2px;
     padding: 4px 12px;
@@ -145,7 +145,7 @@ input[name=radioSelect] + label {
  Change background color for label next to checked radio button
  to make it look like highlighted button
 */
-input[name=radioSelect]:checked + label { 
+input[name=tabTab]:checked + label { 
 	color: black;
 	fontWeight="900";
    background-image: none;
@@ -162,6 +162,7 @@ text-align:center;
 
 #display{
 	width: 100%;
+	height:85%;	
 }
 #timeLabelDiv
 {
@@ -181,6 +182,7 @@ color:white;
 //-----------------------------------------------------------------
 #app{
 	width: 100%;
+	height:100%;	
 	overflow: hidden;
 
 }
@@ -192,7 +194,8 @@ color:white;
 	text-align: center;	
 	border:1px solid #0000FF;
     width: 5%;
-    height:300px;
+    //height:300px;
+    height: 100%;
     margin-right:2%;
     float:left;
 
@@ -202,6 +205,7 @@ color:white;
 	-webkit-user-select: none;
     width: 100%;
     height:240px;
+    //height: 100%;    	
     //float:left;
 }
 
@@ -216,7 +220,8 @@ color:white;
 	left: 0;
 	right: 0;
 	width: 55%;
-	height:300px;
+	//height:300px;
+	 height: 100%;
 	border:3px solid #0000FF;
 
 }
@@ -231,7 +236,7 @@ color:white;
 	left: 0;
 	right: 0;
 	width: 30%;
-	height:80%;	
+	height:85%;	
 	vertical-align:top;
 	display: inline-block; 
 	//float:right;
@@ -245,18 +250,18 @@ color:white;
 	height:20%;	
 	vertical-align:top;
 	//display: inline-block;  
-	border:1px solid #0000FF;
+	border:1px solid #00FF00;
 	//float:right;
 }
 
 
 .myTabs{
-	border:1px solid #0000FF;
+	border:1px solid #00FF00;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	width: 100%;
-	height:40%;
+	height:80%;
 	vertical-align:top;
 	display: none;  // set in code to "none" or "inline-block"
 

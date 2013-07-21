@@ -20,6 +20,7 @@ define(
             //  time2Px = function for translating the time samples on these objects to pixel for drawing
             draw: function(ctx, time2Px){
                var dispPx=time2Px(this.d[0][0]);
+               //console.log("")
                // Display the element
                ctx.fillStyle = this.color;
 
