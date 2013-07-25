@@ -1,93 +1,97 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="css/appstyle.css">
-        <title>messaging demo</title>
-        <meta name="description" content="action messaging">
-        <script type="text/javascript" data-main="appscripts/main.js" src="jslibs/require.js"></script>
+<head>
+    <link rel="stylesheet" type="text/css" href="css/appstyle.css">
+    <link rel="stylesheet" type="text/css" href="css/radiostyle.css">
 
-        <meta name="viewport" content="initial-scale=1.0">
-    </head>
-    <body >
-    <div id="wrapper">
+    <title>messaging demo</title>
+    <meta name="description" content="action messaging">
+    <script type="text/javascript" data-main="appscripts/main.js" src="jslibs/require.js"></script>
 
-        <div id="app">
-            <h3> Shared Scrolling "Anticipatory" Score </h3><br>
-             <div id="display">
-                <div id="timeLabelDiv">
-                    Time 
-                </div>
-                <div id="timeDisplayDiv">
-            	   Time 
-                </div>
+    <meta name="viewport" content="initial-scale=1.0">
+</head>
+<body >
 
-                <div id="app">
+    <object data="images/test.svg" type="image/svg+xml"></object>
+    <!-- for testing svg files with the canvas (see rhythmEvent) -->
+    <!-- <img id="testimg" src="images/test.svg"  > -->
 
-                    <span id="slider_area">
-                        (w)
-                        <canvas id="slidercanvas1"></canvas>
-                        (x)
-                    </span>   
+    <div id="app">
+        <h3> Shared Scrolling "Anticipatory" Score </h3><br>
+        <div id="display">
+            <div id="timeLabelDiv">
+                Time 
+            </div>
+            <div id="timeDisplayDiv">
+                Time 
+            </div>
+            <div id="subapp">
 
-                    <span id="scoreSpan">
-                        <canvas id="score"></canvas>
+                <span id="sliderSpan">
+                (w) <br>
+                    <canvas id="slidercanvas1"></canvas><br>
+                    (x)
+                </span>   
+
+                <span id="scoreSpan">
+                    <canvas id="score"></canvas>
+                </span>
+
+                <div id="superTabDiv"> <!-- for both tab buttons and tab panes -->
+
+                  <div> <!-- for tab buttons  -->
+
+                    <span id="radioSelect">
+                        <div id="radioSelectDiv">
+
+
+                        </div>
                     </span>
-
-                    <div id="superTabDiv"> <!-- for both tab buttons and tab panes -->
-
-                      <div> <!-- for tab buttons  -->
-
-                        <span id="radioSelect">
-                            <div id="radioSelectDiv">
+                </div> <!-- for tab buttons  -->
+                <div> <!-- for tab panes  -->
 
 
-                            </div>
-                        </span>
-                      </div> <!-- for tab buttons  -->
-                      <div> <!-- for tab panes  -->
+                    <!-- These three divs alternat visibility depending on the radio button selection above -->
+                    <span>
+                        <div class="myTabs" id="pitchTab">
+                        </div>
+
+                        <div class="myTabs" id="rhythmTab">
+                        </div>
+
+                        <div class="myTabs" id="chordTab">
+                        </div>
 
 
-                        <!-- These three divs alternat visibility depending on the radio button selection above -->
-                        <span>
-                            <div class="myTabs" id="pitchTab">
-                            </div>
+                        <div class="myTabs" id="contourTab">
+                            contour tab
+                        </div>
 
-                             <div class="myTabs" id="rhythmTab">
-                            </div>
+                        <div class="myTabs" id="sprayTab">
+                            spray tab
+                        </div>
 
-                             <div class="myTabs" id="chordTab">
-                            </div>
+                    </span>
+                </div>  <!-- for tab panes -->
 
+            </div> <!-- subapp-->
 
-                            <div class="myTabs" id="contourTab">
-                                contour tab
-                            </div>
+        </div> <!-- display-->
 
-                            <div class="myTabs" id="sprayTab">
-                                spray tab
-                            </div>
+        <div id="control_section">
+            Join a room:
+            <select id="roomList">
+                <option></option>
+                <option>defaultRoom</option>
+            </select>
+            <div id="room_textbox">
+                <p>You are in room: <input type="text" id="current_room" size="20"></p>
+            </div>
 
-                         </span>
-                       </div>  <!-- for tab panes -->
+        </div><!-- display -->
+    </div>  
 
-                     </div>
-
-                </div>
-
-            <div id="control_section">
-                Join a room:
-                <select id="roomList">
-                    <option></option>
-                    <option>defaultRoom</option>
-                </select>
-                <div id="room_textbox">
-                    <p>You are in room: <input type="text" id="current_room" size="20"></p>
-                </div>
-
-            </div><!-- display -->
-            </div>  
-         </div>
-    </body>
+</body>
 </html>
 

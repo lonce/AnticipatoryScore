@@ -8,7 +8,7 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=3;
  			var numCols=2;
- 			var k_labels=["G", "C", "D", "F",  " A min", "E min"  ];
+ 			var k_labels=["A", "E" ];
 
 
  			var myInterface={};
@@ -26,7 +26,9 @@ define(
 			tindex=0;
 			for(j=0;j<numRows;j++){
 				var rowElmt=document.createElement("tr");
+				if (tindex >= k_labels.length) break;
 				for(i=0;i<numCols;i++){
+					if (tindex >= k_labels.length) break;
 					var cellElmt = document.createElement("td");
 					var inputElmt = document.createElement("input");
 					var uid=utils.uid();

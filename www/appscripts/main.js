@@ -191,11 +191,18 @@ require(
 
 		var numTracks = 4;
 		var trackHeight=theCanvas.height / numTracks;
-		var trackY =[]; // array of y-values (pixels) that devide each track on the score
+		var m_track =[]; // array of {min: max:} values (in pixels) that devide each track on the score
 		for (var i=0;i<numTracks;i++){
-			trackY[i]=i*trackHeight;
+			m_track[i]={};
+			m_track[i].min=i*trackHeight;
+			m_track[i].max=(i+1)*trackHeight;
 		}
 
+		var m_typeTrack = {
+			"Pitch": 1,
+			"Chord": 2,
+			"Rhythm": 3
+		}
 
 
 		var time2PxOLD=function(time, elapsedTime){ // time measured since timeOrigin
@@ -275,9 +282,11 @@ require(
 			context.lineWidth =1;			
 			for (var i=1;i<numTracks;i++){
 				context.beginPath();
-				context.moveTo(0, trackY[i]);
-				context.lineTo(theCanvas.width, trackY[i]);
+				context.moveTo(0, m_track[i].min);
+				context.lineTo(theCanvas.width, m_track[i].min);
 				context.stroke();
+				context.closePath();
+
 			}
 
 
@@ -318,15 +327,19 @@ require(
 						console.log(dispe.type + " has a new state element");
 
 					} 
+
+					// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
+					if (m_playState[displayElements[dispElmt].type] != displayElements[dispElmt]){
+						if (t_end< nowLinePx){
+							displayElements.splice(dispElmt,1);
+							console.log("remove element off history");
+							//continue;
+						}
+					}
+
+
 				}
 
-				// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
-				if (m_playState[displayElements[dispElmt].type] != displayElements[dispElmt]){
-					if (t_end< nowLinePx){
-						displayElements.splice(dispElmt,1);
-						continue;
-					}
-				}
 
 			}
 
@@ -372,9 +385,12 @@ require(
 			var t = Date.now()-timeOrigin + px2Time(x);		
 
 			var radioSelection=m_tabTab.currentSelection();
+
+
  	
 
 			if (radioSelection==="Contour"){
+				y = (m_typeTrack["Contour"] && m_track[m_typeTrack["Contour"]].min) || y;
 				//current_mgesture={type: 'mouseContourGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=contourEvent();
 				current_mgesture.d=[[t,y,z]];
@@ -391,6 +407,7 @@ require(
 			} 
 
 			if (radioSelection==="Spray"){
+				y = (m_typeTrack["Spray"] && m_track[m_typeTrack["Spray"]].min) || y;
 				//current_mgesture={type: 'mouseEventGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=sprayEvent();
 				current_mgesture.d=[[t,y,z]];
@@ -407,6 +424,7 @@ require(
 			} 
 
 			if (radioSelection==="Pitch"){
+				y = (m_typeTrack["Pitch"] && m_track[m_typeTrack["Pitch"]].min) || y;
 				current_mgesture=pitchEvent(m_pTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;
@@ -415,6 +433,8 @@ require(
 			}
 
 			if (radioSelection==="Rhythm"){
+				console.log(" m_typeTrack[\"Rhythm\"] = " + m_typeTrack["Rhythm"].min + ", and m_track[m_typeTrack[\"Rhythm\"]].min = " + m_track[m_typeTrack["Rhythm"]].min);
+				y = (m_typeTrack["Rhythm"] && m_track[m_typeTrack["Rhythm"]].min) || y;
 				current_mgesture=rhythmEvent(m_rTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;
@@ -423,6 +443,7 @@ require(
 			}
 
 			if (radioSelection==="Chord"){
+				y = (m_typeTrack["Chord"] && m_track[m_typeTrack["Chord"]].min) || y;
 				current_mgesture=chordEvent(m_cTab.currentSelection());
 				current_mgesture.d= [[t,y,z]];
 				current_mgesture.s= myID;

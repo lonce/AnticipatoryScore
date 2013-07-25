@@ -9,206 +9,62 @@ h3 {
 	text-align: center
 }
 
-
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=pradio] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=pradio] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=pradio]:checked + label { 
-	color: black;
-	font-weight: "900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
+img {
+	background-color:white;
+	/* height:400px; */
+	/* width:500px;  */
 }
 
-/*---------------------------------------------------------------- */
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=rradio] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=rradio] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=rradio]:checked + label { 
-	color: black;
-	fontWeight="900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
-}
-
-/*---------------------------------------------------------------- */
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=cradio] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=cradio] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=cradio]:checked + label { 
-	color: black;
-	fontWeight="900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
-}
-
-/*---------------------------------------------------------------- */
-
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=tabTab] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=tabTab] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=tabTab]:checked + label { 
-	color: black;
-	fontWeight="900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
-}
-
-/*---------------------------------------------------------------- */
-
-#display{
-	width: 100%;
-	height:85%;	
-}
-#timeLabelDiv
-{
-color:white;
-	-webkit-user-select: none;
-	width: 88%;
-	text-align: center	
-}
-
-#timeDisplayDiv
-{
-color:white;
-	-webkit-user-select: none;
-	width: 88%;
-	text-align: center	
-}
-//-----------------------------------------------------------------
 #app{
 	width: 100%;
 	height:100%;	
-	overflow: hidden;
+	//overflow: hidden;
+}
 
+#display{
+	width: 100%;
+	height:100%;	
+
+}
+
+#timeLabelDiv{
+	color:white;
+	-webkit-user-select: none;
+	width: 88%;
+	text-align: center;
+}
+
+#timeDisplayDiv{
+color:white;
+	-webkit-user-select: none;
+	width: 88%;
+	text-align: center;	
+}
+/* ----------------------------------------------------------------- */
+#subapp{
+	width: 100%;
+	height:80%;
+	border:2px solid #FFFFFF;
 }
 /* http://jsfiddle.net/ArondeParon/SPjsf/15/ */
 /* http://css-infos.net/property/-webkit-appearance */
-#slider_area {
+#sliderSpan {
 	-webkit-user-select: none;
 	color:blue;
 	text-align: center;	
 	border:1px solid #0000FF;
-    width: 5%;
-    //height:300px;
-    height: 100%;
+    width: 3%;
+	height:80%;
     margin-right:2%;
     float:left;
-
-
 }
-#slidercanvas1 {
+#slidercanvas1{
 	-webkit-user-select: none;
-    width: 100%;
-    height:240px;
-    //height: 100%;    	
-    //float:left;
+	border:1px solid #FF00FF;
+    width: 20px;
+    height:70%;
+    /* float:left; */
 }
-
 .scoreSpan{
 
 }
@@ -219,15 +75,13 @@ color:white;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	width: 55%;
-	//height:300px;
-	 height: 100%;
+	width: 70%;
+	 height: 80%;
 	border:3px solid #0000FF;
 
 }
 
 #radioSelect {
-	//border:1px solid green;
 
 }
 #superTabDiv{
@@ -235,12 +89,11 @@ color:white;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	width: 30%;
-	height:85%;	
+	width: 23%;
+	height:80%;	
 	vertical-align:top;
 	display: inline-block; 
-	//float:right;
-
+	float:right;
 }
 #radioSelectDiv{
 	top: 0;
@@ -249,9 +102,8 @@ color:white;
 	width: 100%;
 	height:20%;	
 	vertical-align:top;
-	//display: inline-block;  
+	display: inline-block;  
 	border:1px solid #00FF00;
-	//float:right;
 }
 
 

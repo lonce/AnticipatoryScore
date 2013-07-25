@@ -65,6 +65,7 @@ define(
                }
                // close and fill the whole shape as one big plygon
                ctx.closePath();
+               
                ctx.stroke();  
                ctx.globalAlpha = 0.25;
                ctx.fill(); 

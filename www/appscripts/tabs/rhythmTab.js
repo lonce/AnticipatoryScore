@@ -11,13 +11,13 @@ define(
  			var k_labels=[];
 
  			//------------------------------------
- 			var imagesFileName=["images/rhythm1.jpg", "images/rhythm2.jpg", "images/rhythm3.jpg", "images/rhythm4.jpg"];
+ 			var imagesFileName=["images/rhythm1.jpg", "images/rhythm2.jpg", "images/rhythm3.jpg", "images/test.svg"];
 
  			for(var i=0;i<imagesFileName.length;i++){
  				k_labels[i] = new Image(); 
 				k_labels[i].src = imagesFileName[i];
-				k_labels[i].width=90;  // for displaying in the tab
-				k_labels[i].height=40;
+				k_labels[i].width=110;  // for displaying in the tab
+				k_labels[i].height=70;
 			}
  			//------------------------------------
 
@@ -34,7 +34,9 @@ define(
 			tindex=0;
 			for(j=0;j<numRows;j++){
 				var rowElmt=document.createElement("tr");
+				if (tindex >= k_labels.length) break;
 				for(i=0;i<numCols;i++){
+					if (tindex >= k_labels.length) break;
 					var cellElmt = document.createElement("td");
 					var inputElmt = document.createElement("input");
 					var uid=utils.uid();

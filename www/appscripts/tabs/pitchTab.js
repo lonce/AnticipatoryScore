@@ -8,7 +8,7 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=3;
  			var numCols=3;
- 			var k_labels=["C3", "C3#", "D3", "D3#",  "E3", "F3", "F3#", "G3", "G3#", "A3", "A3#", "B3" ];
+ 			var k_labels=["c#", "d#", "f", "g#", "a#" ];
 
 
  			var myInterface={};
@@ -26,7 +26,9 @@ define(
 			tindex=0;
 			for(j=0;j<numRows;j++){
 				var rowElmt=document.createElement("tr");
+				if (tindex >= k_labels.length) break;									
 				for(i=0;i<numCols;i++){
+					if (tindex >= k_labels.length) break;
 					var cellElmt = document.createElement("td");
 					var inputElmt = document.createElement("input");
 					var uid=utils.uid();
@@ -77,7 +79,7 @@ define(
 			//----------------------------------------------------------------
 			// Initialization
 
-			myInterface.SelectRadio(k_labels.length/2);
+			myInterface.SelectRadio(0);
 
 			for(var i=0;i<radioButtonArray.length;i++){
 				console.log("assigning " + radioButtonArray[i] + " a handler")
