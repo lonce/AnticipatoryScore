@@ -1,26 +1,14 @@
 define(
-	["soundbank", "config"],
-	function (soundbank, config) {
+	["soundbank", "config", "scoreEvents/generalScoreEvent"],
+	function (soundbank, config, generalScoreEvent) {
       return function (){
 
- 
-         var contourEvent={
-            type: "mouseContourGesture",
-            d: null,
-            s: null,
+         var m_scoreEvent=generalScoreEvent("mouseContourGesture");
 
-            color: "FFFFFF",
-
-            soundbank: null,
-            snd: null,
-
-            // args: 
-            //  ctx - 2D canvax drawing contex
-            //  time2Px = function for translating the time sampls on these objects to pixel for drawing
-            draw: function(ctx, time2Px, nowishP){
+         m_scoreEvent.draw = function(ctx, time2Px, nowishP){
 
                var dispPx=time2Px(this.d[0][0]);
-                     // If crossing the "now" line, make a little explosion
+
 
                if (nowishP(this.d[0][0])){
                   //console.log("contour start, get a new snd")
@@ -70,9 +58,10 @@ define(
                ctx.globalAlpha = 0.25;
                ctx.fill(); 
                ctx.globalAlpha = 1;      
-            }
-         };
+            };
+
+ 
          
-   		return contourEvent;
+   		return m_scoreEvent;
       }
 });

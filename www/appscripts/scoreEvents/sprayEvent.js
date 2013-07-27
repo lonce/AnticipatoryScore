@@ -1,22 +1,11 @@
 define(
-	["soundbank", "config"],
-	function (soundbank, config) {
+	["soundbank", "config", "scoreEvents/generalScoreEvent"],
+	function (soundbank, config, generalScoreEvent) {
       return function (){
 
-         var sprayEvent={
-            type: "mouseEventGesture",
-            d: null,
-            s: null,
+         var m_scoreEvent=generalScoreEvent("mouseEventGesture");
 
-            color: "FFFFFF",
-
-            soundbank: null,
-            snd: null,
-
-            // args: 
-            //  ctx - 2D canvax drawing contex
-            //  time2Px = function for translating the time sampls on these objects to pixel for drawing
-            draw: function(ctx, time2Px, nowishP){
+         m_scoreEvent.draw = function(ctx, time2Px, nowishP){
 
                var dispPx;
 
@@ -42,8 +31,9 @@ define(
                   ctx.closePath();
                   ctx.fill();
                }
-            }
-         };
-         return sprayEvent;
+            } 
+
+ 
+         return m_scoreEvent;
       };
 });

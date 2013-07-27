@@ -1,13 +1,14 @@
 define(
-	["canvg/rgbcolor", "canvg/StackBlur","canvg/canvg"],
-	function () {
+	["scoreEvents/generalScoreEvent", "canvg/rgbcolor", "canvg/StackBlur","canvg/canvg"],
+	function (generalScoreEvent) {
 
       // For rhythm, the argument to this factory function is an image
       return function (i_arg){
 
-         var dispThing = i_arg;
+         var m_scoreEvent=generalScoreEvent("rhythmEvent");
 
-         var myDraw = function(ctx, x, y){
+
+         m_scoreEvent.myDraw = function(ctx, x, y){
                //console.log("rhythmTag, arg is " + i_arg);
 
 
@@ -55,28 +56,6 @@ define(
                ctx.fill();      
          }
 
-
-         var pitchEvent={
-            type: "rhythmEvent",
-            d: null,
-            s: null,
-
-            color: "FFFFFF",
-            //legalValues: k_pitches,
-            dispThing: i_arg,
-
-
-            draw: function(ctx, time2Px){
-               myDraw(ctx, time2Px(this.d[0][0]), this.d[0][1]);
-
-             },
-
-            drawAtPixel: function(ctx, xval){
-               myDraw(ctx, xval, this.d[0][1]);
-            }
-
-         };
-
-         return pitchEvent;
+         return m_scoreEvent;
       }
 });

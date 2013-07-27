@@ -82,7 +82,9 @@ require(
 			//console.log("  ...   current_remoteEvent[src].d is " + current_remoteEvent[src].d.prettyString());
 			current_remoteEvent[src].d = current_remoteEvent[src].d.concat(data);
 			if (data.length === 0) console.log("Got contour event with 0 length data!");
-			current_remoteEvent[src].e=data[data.length-1][0];
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			//current_remoteEvent[src].e=data[data.length-1][0];
 			//console.log(" ... after concatenation, oteEvent[src].d is " + current_remoteEvent[src].d.prettyString());
 
 			//---displayElements.push({type: 'mouseGesture', b: data[0][0], e: data[data.length-1][0], d: data, s: src});
@@ -94,8 +96,8 @@ require(
 	
 
 			current_remoteEvent[src]=contourEvent();
-			current_remoteEvent[src].b=data[0][0];
-			current_remoteEvent[src].e=data[data.length-1][0];
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
 			current_remoteEvent[src].d=data;
 			current_remoteEvent[src].s=src;
 			current_remoteEvent[src].soundbank=soundbank;
@@ -110,20 +112,15 @@ require(
 		comm.registerCallback('beginMouseEventGesture', function(data, src) {
 			//current_remoteEvent[src]={type: 'mouseEventGesture', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
-
 			current_remoteEvent[src]=sprayEvent();
-			current_remoteEvent[src].b=data[0][0];
-			current_remoteEvent[src].e=data[data.length-1][0];
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
 			current_remoteEvent[src].d=data;
 			current_remoteEvent[src].s=src;
 
 			current_remoteEvent[src].soundbank=soundbank;
 
-
-
-			//console.log("beginMouseContourGesture from the from source " + src + " ....  b:" + data[0][0] + ", e: " + current_remoteEvent[src].e );
 			displayElements.push(current_remoteEvent[src]);
-			//displayElements.push({type: 'mouseContourGesture', b: data[0][0], e: data[data.length-1][0], d: data, s: src});
 		});
 
 				//---------------------------------------------------------------------------
@@ -131,7 +128,6 @@ require(
 		comm.registerCallback('endMouseGesture', function(data, src) {
 			//console.log("endMouseGesture from the from source " + src + " ....");
 			current_remoteEvent[src]=undefined; // no more data coming
-			//displayElements.push({type: 'mouseContourGesture', b: data[0][0], e: data[data.length-1][0], d: data, s: src});
 		});
 
 		//---------------------------------------------------------------------------
@@ -166,7 +162,6 @@ require(
 				}
 			}
 		});
-
 
 
 
@@ -245,22 +240,24 @@ require(
 				var m = utils.getCanvasMousePosition(theCanvas, last_mousemove_event);
 				var tx=elapsedtime + px2Time(m.x);
 
-				if (current_mgesture && current_mgesture.type === 'mouseContourGesture'){
+				if (current_mgesture.type === 'mouseContourGesture'){
 					// drawn contours must only go up in time
 					if (tx > current_mgesture.d[current_mgesture.d.length-1][0]){
 						current_mgesture.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
 						current_mgesture_2send.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
 					}
 				} 
-				if (current_mgesture &&  current_mgesture.type === 'mouseEventGesture'){
+				if (current_mgesture.type === 'mouseEventGesture'){
 					if (elapsedtime > (m_lastSprayEvent+k_sprayPeriod)){
+						current_mgesture.updateMinTime(tx);
+						current_mgesture.updateMaxTime(tx);
 						current_mgesture.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
 						current_mgesture_2send.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);						
 						m_lastSprayEvent  = Date.now()-timeOrigin;
 					}
-					// drawn contours must only go up in time
+
 				} 
-				if (current_mgesture &&  current_mgesture.type === 'pitchEvent'){
+				if (current_mgesture.type === 'pitchEvent'){
 					// pitch events do not extend in time...
 				}
 			}
@@ -292,26 +289,25 @@ require(
 
 			//------------		
 			// Draw the musical display elements 
-			var t_end; 
-			var t_beg;
+			var p_end; 
 			var dispe;	
 			for(dispElmt=displayElements.length-1;dispElmt>=0;dispElmt--){ // run through in reverse order so we can splice the array to remove long past elements
 				dispe = displayElements[dispElmt];	
 
 
 				// If its moved out of our score window, delete it from the display list
-				t_end=time2Px(displayElements[dispElmt].e);
+				p_end=time2Px(displayElements[dispElmt].e);
 
 
 				// if you are the current play state element of your type
-				if (t_end < pastLinePx){
+				if (p_end < pastLinePx){
 					 if (m_playState[displayElements[dispElmt].type] === displayElements[dispElmt]){
 					 	dispe.drawAtPixel && dispe.drawAtPixel(context, 0);
 
 					 } else{
 					// remove event from display list
 						displayElements.splice(dispElmt,1);
-						console.log("removing element from display list");
+						console.log("removing element from display list because p_end is " + p_end + "and pastLinePx is " + pastLinePx);
 					}
 				} else{
 
@@ -320,8 +316,8 @@ require(
 
 
 					// If element is just crossing the "now" line, create little visual explosion
-					if (nowishP(dispe.d[0][0])){					
-						explosion(time2Px(dispe.d[0][0]), dispe.d[0][1], 5, "#FF0000", 3, "#FFFFFF");
+					if (nowishP(dispe.b)){					
+						explosion(time2Px(dispe.b), dispe.d[0][1], 5, "#FF0000", 3, "#FFFFFF");
 
 						m_playState[dispe.type]=dispe;
 						console.log(dispe.type + " has a new state element");
@@ -330,7 +326,7 @@ require(
 
 					// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
 					if (m_playState[displayElements[dispElmt].type] != displayElements[dispElmt]){
-						if (t_end< nowLinePx){
+						if (p_end< nowLinePx){
 							displayElements.splice(dispElmt,1);
 							console.log("remove element off history");
 							//continue;
@@ -413,6 +409,8 @@ require(
 				current_mgesture.d=[[t,y,z]];
 				current_mgesture.s=myID;
 				current_mgesture.color="#00FF00";
+				current_mgesture.updateMinTime(t);
+				current_mgesture.updateMaxTime(t);
 
 				current_mgesture.soundbank=soundbank;
 
@@ -421,6 +419,7 @@ require(
 
 				m_lastSprayEvent  = Date.now()-timeOrigin; // now, regardless of where on the time score the event is
 				displayElements.push(current_mgesture);
+
 			} 
 
 			if (radioSelection==="Pitch"){
@@ -451,12 +450,17 @@ require(
 				displayElements.push(current_mgesture);
 			}
 
+			current_mgesture.updateMinTime();
+			current_mgesture.updateMaxTime();
+		
+
 		}
 
 		function endContour(){
 			//console.log("current event is " + current_mgesture + " and the data length is " + current_mgesture.d.length);
-			current_mgesture.b=current_mgesture.d[0][0];
-			current_mgesture.e=current_mgesture.d[current_mgesture.d.length-1][0];
+			current_mgesture.updateMinTime(current_mgesture.d[0][0]);
+			//current_mgesture.e=current_mgesture.d[current_mgesture.d.length-1][0];
+			current_mgesture.updateMaxTime(current_mgesture.d[current_mgesture.d.length-1][0]);
 			
 			if (myRoom != '') {
 				console.log("sending event");
