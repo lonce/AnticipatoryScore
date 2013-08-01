@@ -5,6 +5,8 @@ define(
 
          var m_scoreEvent=generalScoreEvent("mouseContourGesture");
 
+         var m_nowVal=null;
+
          m_scoreEvent.draw = function(ctx, time2Px, nowishP){
 
                var dispPx=time2Px(this.d[0][0]);
@@ -35,29 +37,54 @@ define(
                for(var n=0;n<this.d.length;n++){
                   
                   if (nowishP(this.d[n][0])){
+                     m_nowVal=this.d[n][1];
                      this.snd && this.snd.setParamNorm("Carrier Frequency", 1-this.d[n][1]/ctx.canvas.height);
                      this.snd && this.snd.setParamNorm("Modulation Index", 1-this.d[n][2]);
                   }
-                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]);
+                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]+ this.d[n][2]/2);
                }
-               // "turn around" the end
+
                if (nowishP(this.d[n-1][0])){
                   //console.log("contour end across now, and this.snd is " + this.snd);
                   this.snd && this.snd.release();
                   this.snd && this.soundbank.releaseSnd(this.snd); 
                }
-               ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]-this.d[n-1][2]);
+
+               // "turn around" the end
+               ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]-this.d[n-1][2]/2);
                // go backwards at the line width
                for(var n=this.d.length-1;n>=0; n--){
-                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]-this.d[n][2]);
+                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]-this.d[n][2]/2);
                }
                // close and fill the whole shape as one big plygon
                ctx.closePath();
-               
+
                ctx.stroke();  
                ctx.globalAlpha = 0.25;
                ctx.fill(); 
-               ctx.globalAlpha = 1;      
+               ctx.globalAlpha = 1;  
+
+
+               // draw cross-hair on now line of last value to cross it              
+               if (m_nowVal != null){
+
+                           //ctx.strokeStyle = "#FF0000"; 
+                           ctx.lineWidth =1;
+                           ctx.beginPath();             
+                           ctx.moveTo(config.nowLinePx-4, m_nowVal);
+                           ctx.lineTo(config.nowLinePx+4, m_nowVal);
+                           ctx.stroke();
+                           ctx.closePath();
+
+
+
+                  //ctx.beginPath();
+                  //ctx.moveTo(config.nowLinePx-4, m_nowVal);
+                  //ctx.lineTo(config.nowLinePx+4, m_nowVal);
+                 //console.log("tick X " + config.nowLinePx + ", and tickY = " + m_nowVal);
+                  //ctx.closePath();
+                 // ctx.fill(); 
+               }    
             };
 
  

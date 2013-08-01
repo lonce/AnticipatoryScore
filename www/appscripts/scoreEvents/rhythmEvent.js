@@ -11,17 +11,16 @@ define(
          m_scoreEvent.myDraw = function(ctx, x, y){
                //console.log("rhythmTag, arg is " + i_arg);
 
-
                ctx.beginPath();
                ctx.fillStyle = 'white';
-               ctx.rect(x,y,80,32);
+               ctx.rect(x,this.min,70,this.max-this.min);
                ctx.fill();
                ctx.closePath();
 
                ctx.fillStyle = 'black';
               
               // The arg is an html element that has already been converted from svg, so this looks like shit
-               ctx.drawImage(i_arg, x, y, 80, 32);
+               ctx.drawImage(i_arg, x, this.min, 70, this.max-this.min);
                
                // This takes too long to load, and looks better, but not great.
                //ctx.drawSvg("https://upload.wikimedia.org/wikipedia/commons/a/ac/Musical_notes.svg", x, y, 74, 32);

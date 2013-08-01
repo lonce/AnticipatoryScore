@@ -8,6 +8,8 @@ define(
 			exports.webketAudioEnabled=false;
 		}
 
+		exports.nowLinePx; // set in main, used as a global variable
+
 		return exports;
 });
 

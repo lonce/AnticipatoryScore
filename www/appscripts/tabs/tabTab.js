@@ -8,23 +8,15 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=2;
  			var numCols=3;
- 			var k_labels=["Spray", "Contour", "Pitch", "Rhythm",  "Chord" ];
- 			//var k_values=["spray", "contour", "pitch", "rhythm",  "chord" ];
- 			var k_values=[0, 1, 2, 3,  4];
-
-
-
-			var k_tabPane=["sprayTab", "contourTab", "pitchTab", "rhythmTab",  "chordTab" ];
-
+ 			var k_labels=["Spray",     "Dynamics",    "Tempo",    "Pitch",    "Rhythm",     "Chord" ];
+			var k_tabPane=["sprayTab", "dynamicsTab", "tempoTab", "pitchTab", "rhythmTab",  "chordTab" ];
 
 
  			var myInterface={};
-
  			var m_currentSelectionIndex;
 
 			// Create HTML for this Tab -------------------------------------
 			var i,j, tindex;
-
 
 			var thisTab=document.getElementById(docDiv);
 			var tableElmt = document.createElement("div");
@@ -42,7 +34,8 @@ define(
 
 					inputElmt.setAttribute("type", "radio");
 					inputElmt.setAttribute("name", k_inputElmtName );    // used for styling
-					inputElmt.setAttribute("value", k_values[tindex] );
+					inputElmt.setAttribute("value", tindex );
+					//inputElmt.setAttribute("value", k_labels[tindex] );
 					inputElmt.setAttribute("id", uid);  
 
 					cellElmt.appendChild(inputElmt);
@@ -88,12 +81,9 @@ define(
 			// show the right pane
 			var setTab=function(showTab){
 				console.log("in setTab, function arg is  " + showTab);
-				window.document.getElementById("contourTab").style.display="none";
-				window.document.getElementById("sprayTab").style.display="none";
-				window.document.getElementById("pitchTab").style.display="none";
-				window.document.getElementById("rhythmTab").style.display="none";
-				window.document.getElementById("chordTab").style.display="none";
-
+				for(var i=0;i<k_tabPane.length;i++){
+					window.document.getElementById(k_tabPane[i]).style.display="none";
+				}
 				window.document.getElementById(showTab).style.display="inline-block";
 			}
 

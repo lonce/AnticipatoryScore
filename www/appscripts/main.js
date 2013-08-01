@@ -124,7 +124,6 @@ require(
 		});
 
 				//---------------------------------------------------------------------------
-		// data is [timestamp (relative to "now"), x,y] of mouseContourGesture, and src is the id of the clicking client
 		comm.registerCallback('endMouseGesture', function(data, src) {
 			//console.log("endMouseGesture from the from source " + src + " ....");
 			current_remoteEvent[src]=undefined; // no more data coming
@@ -178,13 +177,17 @@ require(
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pxPerSec=pixelShiftPerMs*1000;
 		var nowLinePx=theCanvas.width/3;
+		config.nowLinePx=theCanvas.width/3;
+
+		console.log("CONFIG NOWLINE IS " + config.nowLinePx);
+
 		var pastLinePx=0; // after which we delete the display elements
 
 		var sprocketHeight=2;
 		var sprocketWidth=1;
 		var sprocketInterval=1000; //ms
 
-		var numTracks = 4;
+		var numTracks = 6;
 		var trackHeight=theCanvas.height / numTracks;
 		var m_track =[]; // array of {min: max:} values (in pixels) that devide each track on the score
 		for (var i=0;i<numTracks;i++){
@@ -194,9 +197,12 @@ require(
 		}
 
 		var m_typeTrack = {
+			"Tempo": 0,
 			"Pitch": 1,
 			"Chord": 2,
-			"Rhythm": 3
+			"Rhythm": 3,
+			"Dynamics": 4,
+			"Spray": 5
 		}
 
 
@@ -239,20 +245,24 @@ require(
 			if (current_mgesture) {
 				var m = utils.getCanvasMousePosition(theCanvas, last_mousemove_event);
 				var tx=elapsedtime + px2Time(m.x);
+				var ypix=m.y;
 
 				if (current_mgesture.type === 'mouseContourGesture'){
+					// bound to track limits in the y direction
+					//ypix=Math.min(current_mgesture.max, Math.max(current_mgesture.min, ypix));
+					ypix = utils.bound(ypix, current_mgesture.min, current_mgesture.max);
 					// drawn contours must only go up in time
 					if (tx > current_mgesture.d[current_mgesture.d.length-1][0]){
-						current_mgesture.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
-						current_mgesture_2send.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
+						current_mgesture.d.push([tx, ypix, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
+						current_mgesture_2send.d.push([tx, ypix, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
 					}
 				} 
 				if (current_mgesture.type === 'mouseEventGesture'){
 					if (elapsedtime > (m_lastSprayEvent+k_sprayPeriod)){
 						current_mgesture.updateMinTime(tx);
 						current_mgesture.updateMaxTime(tx);
-						current_mgesture.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
-						current_mgesture_2send.d.push([tx, m.y, k_minLineThickness + k_maxLineThickness*leftSlider.value]);						
+						current_mgesture.d.push([tx, ypix, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
+						current_mgesture_2send.d.push([tx, ypix, k_minLineThickness + k_maxLineThickness*leftSlider.value]);						
 						m_lastSprayEvent  = Date.now()-timeOrigin;
 					}
 
@@ -283,7 +293,6 @@ require(
 				context.lineTo(theCanvas.width, m_track[i].min);
 				context.stroke();
 				context.closePath();
-
 			}
 
 
@@ -321,7 +330,6 @@ require(
 
 						m_playState[dispe.type]=dispe;
 						console.log(dispe.type + " has a new state element");
-
 					} 
 
 					// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
@@ -332,11 +340,7 @@ require(
 							//continue;
 						}
 					}
-
-
 				}
-
-
 			}
 
 			// draw the "now" line
@@ -345,6 +349,7 @@ require(
 			context.beginPath();					
 			context.moveTo(nowLinePx, 0);
 			context.lineTo(nowLinePx, theCanvas.height);
+			context.closePath();
 			context.stroke();
 
 			lastDrawTime=elapsedtime;
@@ -375,7 +380,7 @@ require(
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		function initiateContour(x, y){
+		function initiateScoreGesture(x, y){
 			var z = k_minLineThickness + k_maxLineThickness*leftSlider.value;
 			// time at the "now" line + the distance into the future or past 
 			var t = Date.now()-timeOrigin + px2Time(x);		
@@ -383,76 +388,55 @@ require(
 			var radioSelection=m_tabTab.currentSelection();
 
 
- 	
+			if ((radioSelection==="Tempo") || (radioSelection==="Dynamics")){
+				console.log("initiateScoreGesture: radio selection type is " + radioSelection)
 
-			if (radioSelection==="Contour"){
-				y = (m_typeTrack["Contour"] && m_track[m_typeTrack["Contour"]].min) || y;
-				//current_mgesture={type: 'mouseContourGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=contourEvent();
-				current_mgesture.d=[[t,y,z]];
-				current_mgesture.s=myID;
-				current_mgesture.color="#00FF00";
+				current_mgesture.min=m_track[m_typeTrack[radioSelection]].min;
+				current_mgesture.max=m_track[m_typeTrack[radioSelection]].max;
+
+				y = utils.bound(y, current_mgesture.min, current_mgesture.max);
+
+				console.log("Setting current gesture min to " + current_mgesture.min + ", and max to " + current_mgesture.max);
 
 				current_mgesture.soundbank=soundbank;
-
 				comm.sendJSONmsg("beginMouseContourGesture", [[t,y,z]]);
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
-
-				displayElements.push(current_mgesture);
-
 			} 
 
 			if (radioSelection==="Spray"){
-				y = (m_typeTrack["Spray"] && m_track[m_typeTrack["Spray"]].min) || y;
-				//current_mgesture={type: 'mouseEventGesture', d: [[t,y,z]], s: myID};
 				current_mgesture=sprayEvent();
-				current_mgesture.d=[[t,y,z]];
-				current_mgesture.s=myID;
-				current_mgesture.color="#00FF00";
-				current_mgesture.updateMinTime(t);
-				current_mgesture.updateMaxTime(t);
 
 				current_mgesture.soundbank=soundbank;
-
 				comm.sendJSONmsg("beginMouseEventGesture", [[t,y,z]]);
-				current_mgesture_2send={type: 'mouseEventGesture', d: [], s: myID}; // do I need to add the source here??
-
-				m_lastSprayEvent  = Date.now()-timeOrigin; // now, regardless of where on the time score the event is
-				displayElements.push(current_mgesture);
-
+				current_mgesture_2send={type: 'mouseEventGesture', d: [], s: myID}; // do I need to add the source here??				m_lastSprayEvent  = Date.now()-timeOrigin; // now, regardless of where on the time score the event is
 			} 
 
 			if (radioSelection==="Pitch"){
-				y = (m_typeTrack["Pitch"] && m_track[m_typeTrack["Pitch"]].min) || y;
+				y = (m_typeTrack["Pitch"] && (m_track[m_typeTrack["Pitch"]].min + m_track[m_typeTrack["Pitch"]].max)/2) || y;
 				current_mgesture=pitchEvent(m_pTab.currentSelection());
-				current_mgesture.d= [[t,y,z]];
-				current_mgesture.s= myID;
-				current_mgesture.color="#00FF00";
-				displayElements.push(current_mgesture);
 			}
 
 			if (radioSelection==="Rhythm"){
-				console.log(" m_typeTrack[\"Rhythm\"] = " + m_typeTrack["Rhythm"].min + ", and m_track[m_typeTrack[\"Rhythm\"]].min = " + m_track[m_typeTrack["Rhythm"]].min);
-				y = (m_typeTrack["Rhythm"] && m_track[m_typeTrack["Rhythm"]].min) || y;
+				y = (m_typeTrack["Rhythm"] && (m_track[m_typeTrack["Rhythm"]].min + m_track[m_typeTrack["Rhythm"]].max)/2) || y;
 				current_mgesture=rhythmEvent(m_rTab.currentSelection());
-				current_mgesture.d= [[t,y,z]];
-				current_mgesture.s= myID;
-				current_mgesture.color="#00FF00";
-				displayElements.push(current_mgesture);
 			}
 
 			if (radioSelection==="Chord"){
-				y = (m_typeTrack["Chord"] && m_track[m_typeTrack["Chord"]].min) || y;
+				y = (m_typeTrack["Chord"] && (m_track[m_typeTrack["Chord"]].min + m_track[m_typeTrack["Chord"]].max)/2) || y;
 				current_mgesture=chordEvent(m_cTab.currentSelection());
-				current_mgesture.d= [[t,y,z]];
-				current_mgesture.s= myID;
-				current_mgesture.color="#00FF00";
-				displayElements.push(current_mgesture);
 			}
 
+			current_mgesture.d=[[t,y,z]];
+			current_mgesture.s=myID;
+
+			current_mgesture.color="#00FF00";  // local color is always this
+			current_mgesture.min=m_track[m_typeTrack[radioSelection]].min;   // some elements use these vals for drawing
+			current_mgesture.max=m_track[m_typeTrack[radioSelection]].max;
 			current_mgesture.updateMinTime();
 			current_mgesture.updateMaxTime();
-		
+
+			displayElements.push(current_mgesture);
 
 		}
 
@@ -482,7 +466,7 @@ require(
 			var x = m.x;
 			var y = m.y;
 
-			initiateContour(x, y);
+			initiateScoreGesture(x, y);
 			last_mousemove_event=e;
 		}
 

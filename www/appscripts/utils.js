@@ -10,6 +10,12 @@ define(
                 return (uidBase+uidCount);
             }
 
+            utils.bound=function(val, lowval, hival){
+                return Math.min(hival, Math.max(lowval, val));
+            }
+
+
+
     		// utilities
 		    // Until requestAnimationFrame comes standard in all browsers, test
             // for the prefixed names as well.

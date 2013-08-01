@@ -10,11 +10,11 @@ define(
                ctx.strokeStyle = m_scoreEvent.color;
 
                ctx.beginPath();
-               ctx.rect(x,y,40,30);
+               ctx.rect(x,this.min,40,this.max-this.min);
                ctx.stroke();
                ctx.closePath();
 
-               ctx.fillText(i_arg, x+15, y+20);
+               ctx.fillText(i_arg, x+15, y);
 
 
                ctx.beginPath();

@@ -5,13 +5,15 @@ define(
  
 
          var genEvent={
-            type: i_type || null,
-            d: null,
-            s: null,
-            b: 999999999999999999999999999,
-            e: -999999999999999999999999999,
-
+            type: i_type || null,            // String identifying gesture type
+            d: null,                         // array data of [x,y] values for the gesture
+            s: null,                         // a source ID (number)
+            b: 999999999999999999999999999,  // begin time for this gesture
+            e: -999999999999999999999999999, // end tim for this gesture
             color: "FFFFFF",
+            min: -999999999999999999999999999, // in the y direction
+            max: 999999999999999999999999999,  // in the y direction
+
 
             updateMinTime: function(i_arg){
                if (i_arg){
