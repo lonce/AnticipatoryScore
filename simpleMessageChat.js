@@ -22,10 +22,10 @@ function registerCallback(name, callback) {
 // messages this server handles from clients
 registerCallback('subscribe', subscribe);
 registerCallback('unsubscribe', unsubscribe);
-registerCallback('mouseGesture', mouseGesture);
-registerCallback('beginMouseContourGesture', beginMouseContourGesture);
-registerCallback('beginMouseEventGesture', beginMouseEventGesture);
-registerCallback('endMouseGesture', endMouseGesture);
+//registerCallback('mouseGesture', mouseGesture);
+//registerCallback('beginMouseContourGesture', beginMouseContourGesture);
+//registerCallback('beginMouseEventGesture', beginMouseEventGesture);
+//registerCallback('endMouseGesture', endMouseGesture);
 registerCallback('startTime', startTime);
 
 // Note: for all functions used as callbacks, "this" will be a socket passed to the .call()
@@ -64,6 +64,7 @@ function unsubscribe(rm) {
     }
 }
 
+/*
 // basic data exchange method for responding to one socket, sending to rest
 function mouseGesture(data) {
     roomBroadcast(this.room, this, 'mouseGesture', data);
@@ -82,6 +83,12 @@ function beginMouseEventGesture(data) {
 // basic data exchange method for responding to one socket, sending to rest
 function endMouseGesture(data) {
     roomBroadcast(this.room, this, 'endMouseGesture', data);
+}
+
+*/
+function messageRelay(messageName, data){
+    console.log("messageRelay: message name is " + messageName);
+    roomBroadcast(this.room, this, messageName, data);
 }
 
 // When 'ere a client sends this message, the server sends out a new time to all room members
@@ -106,17 +113,24 @@ function sendJSONmsg(ws, name, data, source) {
 
 function receiveJSONmsg(data, flags) {
     var obj;
+    console.log("receive event");
     try {
         obj = JSON.parse(data);
     } catch (e) {
         return;
     }
     
-    if (!obj.hasOwnProperty('d') || !obj.hasOwnProperty('n') || callbacks[obj.n] === undefined)
-        return;
-    //console.log("object.d: " + object.d + ", object.n:"+ object.n);
 
-    callbacks[obj.n].call(this, obj.d);
+   if (!obj.hasOwnProperty('d') || !obj.hasOwnProperty('n') )
+        return;
+
+    if (callbacks[obj.n] === undefined){
+        // then use generic messageRelay to send event to others in the room
+        messageRelay.call(this, obj.n, obj.d);
+    } else {
+        // call the specificly named message callback to do special stuff
+        callbacks[obj.n].call(this, obj.d);
+    }
 }
 //****************************************************************************
 // Server activity code (other than it's simple message-relay duties)

@@ -24,7 +24,7 @@ define(
                ctx.stroke();
                ctx.closePath();
 
-
+               //console.log("pitch:mydraw - x: " + x + ", x+10: " + (x+10));
                //ctx.stroke();
                ctx.fillText(i_arg, x+10, y+4);
 

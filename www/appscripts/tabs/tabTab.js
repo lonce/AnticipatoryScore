@@ -61,7 +61,6 @@ define(
 			// Interface methods
 
 			myInterface.SelectRadio = function(pnum){
-				console.log("pnum is " + pnum + ", and k_inputElmtName = " + k_inputElmtName);
 				radioButtonArray[pnum].checked = true;
 				m_currentSelectionIndex=pnum; 
 
@@ -69,7 +68,6 @@ define(
 			}
 
 			myInterface.handleClick = function(object){
-				console.log("in handleClick and  object is " + object + ", and pitch button has value " + object.target.value);
 				myInterface.SelectRadio(object.target.value);
 			}
 
@@ -80,7 +78,7 @@ define(
 
 			// show the right pane
 			var setTab=function(showTab){
-				console.log("in setTab, function arg is  " + showTab);
+				//console.log("in setTab, function arg is  " + showTab);
 				for(var i=0;i<k_tabPane.length;i++){
 					window.document.getElementById(k_tabPane[i]).style.display="none";
 				}

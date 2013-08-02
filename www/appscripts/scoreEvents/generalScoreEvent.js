@@ -6,6 +6,7 @@ define(
 
          var genEvent={
             type: i_type || null,            // String identifying gesture type
+            i: null,                         // some types use indexes to identify the display element to use (eg chords)
             d: null,                         // array data of [x,y] values for the gesture
             s: null,                         // a source ID (number)
             b: 999999999999999999999999999,  // begin time for this gesture

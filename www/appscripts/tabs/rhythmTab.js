@@ -8,7 +8,7 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=4;
  			var numCols=1;
- 			var k_labels=[];
+ 			var k_labels=[]; // assigned below
 
  			//------------------------------------
  			var imagesFileName=["images/rhythm1.png", "images/rhythm2.jpg", "images/rhythm3.jpg", "images/test.svg"];

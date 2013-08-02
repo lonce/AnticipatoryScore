@@ -94,14 +94,12 @@ require(
 		comm.registerCallback('beginMouseContourGesture', function(data, src) {
 			console.log("got begin mouse contour gesture from the net");
 	
-
 			current_remoteEvent[src]=contourEvent();
-			current_remoteEvent[src].updateMinTime();
-			current_remoteEvent[src].updateMaxTime();
 			current_remoteEvent[src].d=data;
 			current_remoteEvent[src].s=src;
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
 			current_remoteEvent[src].soundbank=soundbank;
-
 
 			//console.log("beginMouseContourGesture from the from source " + src + " ....  b:" + data[0][0] + ", e: " + current_remoteEvent[src].e );
 			displayElements.push(current_remoteEvent[src]);
@@ -109,14 +107,14 @@ require(
 		});
 
 		//---------------------------------------------------------------------------
-		comm.registerCallback('beginMouseEventGesture', function(data, src) {
-			//current_remoteEvent[src]={type: 'mouseEventGesture', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+		comm.registerCallback('beginMouseEventSpray', function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
 			current_remoteEvent[src]=sprayEvent();
-			current_remoteEvent[src].updateMinTime();
-			current_remoteEvent[src].updateMaxTime();
 			current_remoteEvent[src].d=data;
 			current_remoteEvent[src].s=src;
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
 
 			current_remoteEvent[src].soundbank=soundbank;
 
@@ -124,10 +122,62 @@ require(
 		});
 
 				//---------------------------------------------------------------------------
-		comm.registerCallback('endMouseGesture', function(data, src) {
-			//console.log("endMouseGesture from the from source " + src + " ....");
+		comm.registerCallback('endMouseEventSpray', function(data, src) {
+			//console.log("endMouseEventSpray from the from source " + src + " ....");
 			current_remoteEvent[src]=undefined; // no more data coming
 		});
+
+		//------------------------------------------------------------------------------------
+		comm.registerCallback("chordEvent", function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+
+			console.log("received chord event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=chordEvent(m_cTab.currentSelection());
+			current_remoteEvent[src].d=data.d;
+			current_remoteEvent[src].s=src;
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			current_remoteEvent[src].min=m_track[m_typeTrack["Chord"]].min;   // some elements use these vals for drawing
+			current_remoteEvent[src].max=m_track[m_typeTrack["Chord"]].max;
+
+
+			displayElements.push(current_remoteEvent[src]);
+		});
+
+		//------------------------------------------------------------------------------------
+		comm.registerCallback("pitchEvent", function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+
+			console.log("received pitch event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=pitchEvent(m_pTab.currentSelection());
+			current_remoteEvent[src].d=data.d;
+			current_remoteEvent[src].s=src;
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			current_remoteEvent[src].min=m_track[m_typeTrack["Pitch"]].min;   // some elements use these vals for drawing
+			current_remoteEvent[src].max=m_track[m_typeTrack["Pitch"]].max;
+
+
+			displayElements.push(current_remoteEvent[src]);
+		});
+
+		//------------------------------------------------------------------------------------
+		comm.registerCallback("rhythmEvent", function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+
+			console.log("received rhythm event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=rhythmEvent(m_rTab.currentSelection());
+			current_remoteEvent[src].d=data.d;
+			current_remoteEvent[src].s=src;
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			current_remoteEvent[src].min=m_track[m_typeTrack["Rhythm"]].min;   // some elements use these vals for drawing
+			current_remoteEvent[src].max=m_track[m_typeTrack["Rhythm"]].max;
+
+
+			displayElements.push(current_remoteEvent[src]);
+		});
+
 
 		//---------------------------------------------------------------------------
 		comm.registerCallback('metroPulse', function(data, src) {
@@ -173,7 +223,7 @@ require(
 		var mouseY;
 		context.font="9px Arial";
 
-		var scoreWindowTimeLength=20000; //ms
+		var scoreWindowTimeLength=30000; //ms
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pxPerSec=pixelShiftPerMs*1000;
 		var nowLinePx=theCanvas.width/3;
@@ -257,7 +307,7 @@ require(
 						current_mgesture_2send.d.push([tx, ypix, k_minLineThickness + k_maxLineThickness*leftSlider.value]);
 					}
 				} 
-				if (current_mgesture.type === 'mouseEventGesture'){
+				if (current_mgesture.type === 'mouseEventSpray'){
 					if (elapsedtime > (m_lastSprayEvent+k_sprayPeriod)){
 						current_mgesture.updateMinTime(tx);
 						current_mgesture.updateMaxTime(tx);
@@ -316,7 +366,7 @@ require(
 					 } else{
 					// remove event from display list
 						displayElements.splice(dispElmt,1);
-						console.log("removing element from display list because p_end is " + p_end + "and pastLinePx is " + pastLinePx);
+						//console.log("removing element from display list because p_end is " + p_end + "and pastLinePx is " + pastLinePx);
 					}
 				} else{
 
@@ -329,7 +379,7 @@ require(
 						explosion(time2Px(dispe.b), dispe.d[0][1], 5, "#FF0000", 3, "#FFFFFF");
 
 						m_playState[dispe.type]=dispe;
-						console.log(dispe.type + " has a new state element");
+						//console.log(dispe.type + " has a new state element");
 					} 
 
 					// get rid of all elements past the "now" line that are not the playstate (the last one to have crossed it)
@@ -408,23 +458,26 @@ require(
 				current_mgesture=sprayEvent();
 
 				current_mgesture.soundbank=soundbank;
-				comm.sendJSONmsg("beginMouseEventGesture", [[t,y,z]]);
-				current_mgesture_2send={type: 'mouseEventGesture', d: [], s: myID}; // do I need to add the source here??				m_lastSprayEvent  = Date.now()-timeOrigin; // now, regardless of where on the time score the event is
+				comm.sendJSONmsg("beginMouseEventSpray", [[t,y,z]]);
+				current_mgesture_2send={type: 'mouseEventSpray', d: [], s: myID}; // do I need to add the source here??				m_lastSprayEvent  = Date.now()-timeOrigin; // now, regardless of where on the time score the event is
 			} 
 
 			if (radioSelection==="Pitch"){
 				y = (m_typeTrack["Pitch"] && (m_track[m_typeTrack["Pitch"]].min + m_track[m_typeTrack["Pitch"]].max)/2) || y;
 				current_mgesture=pitchEvent(m_pTab.currentSelection());
+				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]]});
 			}
 
 			if (radioSelection==="Rhythm"){
 				y = (m_typeTrack["Rhythm"] && (m_track[m_typeTrack["Rhythm"]].min + m_track[m_typeTrack["Rhythm"]].max)/2) || y;
 				current_mgesture=rhythmEvent(m_rTab.currentSelection());
+				comm.sendJSONmsg("rhythmEvent", {"d":[[t,y,z]]});
 			}
 
 			if (radioSelection==="Chord"){
 				y = (m_typeTrack["Chord"] && (m_track[m_typeTrack["Chord"]].min + m_track[m_typeTrack["Chord"]].max)/2) || y;
 				current_mgesture=chordEvent(m_cTab.currentSelection());
+				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]]});
 			}
 
 			current_mgesture.d=[[t,y,z]];
@@ -452,7 +505,7 @@ require(
 					if (current_mgesture_2send.d.length > 0){
 						comm.sendJSONmsg("mouseGesture", current_mgesture_2send.d);
 					}
-					comm.sendJSONmsg("endMouseGesture", []);
+					comm.sendJSONmsg("endMouseEventSpray", []);
 				}	
 			}
 			current_mgesture=undefined;

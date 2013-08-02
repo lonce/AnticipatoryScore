@@ -3,7 +3,7 @@ define(
 	function (soundbank, config, generalScoreEvent) {
       return function (){
 
-         var m_scoreEvent=generalScoreEvent("mouseEventGesture");
+         var m_scoreEvent=generalScoreEvent("mouseEventSpray");
 
          m_scoreEvent.draw = function(ctx, time2Px, nowishP){
 
