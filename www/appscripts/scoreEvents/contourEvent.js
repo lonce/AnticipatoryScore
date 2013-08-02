@@ -12,11 +12,13 @@ define(
                var dispPx=time2Px(this.d[0][0]);
 
 
+ /*
                if (nowishP(this.d[0][0])){
                   //console.log("contour start, get a new snd")
                   this.snd=this.soundbank.getSnd();
                   this.snd && this.snd.play();
                } 
+ */
 
                // Display the element
                ctx.fillStyle = this.color;
@@ -38,23 +40,26 @@ define(
                   
                   if (nowishP(this.d[n][0])){
                      m_nowVal=this.d[n][1];
-                     this.snd && this.snd.setParamNorm("Carrier Frequency", 1-this.d[n][1]/ctx.canvas.height);
-                     this.snd && this.snd.setParamNorm("Modulation Index", 1-this.d[n][2]);
+                     //this.snd && this.snd.setParamNorm("Carrier Frequency", 1-this.d[n][1]/ctx.canvas.height);
+                     //this.snd && this.snd.setParamNorm("Modulation Index", 1-this.d[n][2]);
                   }
-                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]+ this.d[n][2]/2);
+                 // ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]+ this.d[n][2]/2);
+                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]);
                }
-
+/*
                if (nowishP(this.d[n-1][0])){
                   //console.log("contour end across now, and this.snd is " + this.snd);
                   this.snd && this.snd.release();
                   this.snd && this.soundbank.releaseSnd(this.snd); 
                }
-
+*/
                // "turn around" the end
-               ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]-this.d[n-1][2]/2);
+               //ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]-this.d[n-1][2]/2);
+               ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]);
                // go backwards at the line width
                for(var n=this.d.length-1;n>=0; n--){
-                  ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]-this.d[n][2]/2);
+                  //ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]-this.d[n][2]/2);
+                  ctx.lineTo(time2Px(this.d[n][0]), this.track.max);
                }
                // close and fill the whole shape as one big plygon
                ctx.closePath();
@@ -68,26 +73,31 @@ define(
                // draw cross-hair on now line of last value to cross it              
                if (m_nowVal != null){
 
-                           //ctx.strokeStyle = "#FF0000"; 
-                           ctx.lineWidth =1;
-                           ctx.beginPath();             
-                           ctx.moveTo(config.nowLinePx-4, m_nowVal);
-                           ctx.lineTo(config.nowLinePx+4, m_nowVal);
-                           ctx.stroke();
-                           ctx.closePath();
+                     //ctx.strokeStyle = "#FF0000"; 
+                     ctx.lineWidth =1;
+                     ctx.beginPath();             
+                     ctx.moveTo(config.nowLinePx-4, m_nowVal);
+                     ctx.lineTo(config.nowLinePx+4, m_nowVal);
+                     ctx.stroke();
+                     ctx.closePath();
 
-
-
-                  //ctx.beginPath();
-                  //ctx.moveTo(config.nowLinePx-4, m_nowVal);
-                  //ctx.lineTo(config.nowLinePx+4, m_nowVal);
-                 //console.log("tick X " + config.nowLinePx + ", and tickY = " + m_nowVal);
-                  //ctx.closePath();
-                 // ctx.fill(); 
                }    
             };
 
  
+            // just draw cross hair on now line at the value of end of contour...
+            m_scoreEvent.drawAtPixel =  function(ctx, xval){
+               if (m_nowVal != null){
+                     ctx.strokeStyle = this.color;
+                     ctx.lineWidth =1;
+                     ctx.beginPath();             
+                     ctx.moveTo(config.nowLinePx-4, m_nowVal);
+                     ctx.lineTo(config.nowLinePx+4, m_nowVal);
+                     ctx.stroke();
+                     ctx.closePath();
+               }    
+            };
+
          
    		return m_scoreEvent;
       }

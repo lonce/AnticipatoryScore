@@ -8,8 +8,8 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=2;
  			var numCols=3;
- 			var k_labels=["Spray",     "Dynamics",    "Tempo",    "Pitch",    "Rhythm",     "Chord" ];
-			var k_tabPane=["sprayTab", "dynamicsTab", "tempoTab", "pitchTab", "rhythmTab",  "chordTab" ];
+ 			var k_labels=["Dynamics",    "Tempo",    "Pitch",    "Rhythm",     "Chord" ];
+			var k_tabPane=["dynamicsTab", "tempoTab", "pitchTab", "rhythmTab",  "chordTab" ];
 
 
  			var myInterface={};
@@ -75,6 +75,13 @@ define(
 				return k_labels[m_currentSelectionIndex];
 			};
 
+			myInterface.label = function(id){
+				return k_labels[id];
+			};
+			
+			myInterface.currentIndex = function(){
+				return m_currentSelectionIndex;
+			};
 
 			// show the right pane
 			var setTab=function(showTab){

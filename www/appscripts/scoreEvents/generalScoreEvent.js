@@ -12,9 +12,7 @@ define(
             b: 999999999999999999999999999,  // begin time for this gesture
             e: -999999999999999999999999999, // end tim for this gesture
             color: "FFFFFF",
-            min: -999999999999999999999999999, // in the y direction
-            max: 999999999999999999999999999,  // in the y direction
-
+ 
 
             updateMinTime: function(i_arg){
                if (i_arg){

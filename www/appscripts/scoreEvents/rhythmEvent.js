@@ -13,14 +13,14 @@ define(
 
                ctx.beginPath();
                ctx.fillStyle = 'white';
-               ctx.rect(x,this.min,70,this.max-this.min);
+               ctx.rect(x,this.track.min,70,this.track.max-this.track.min);
                ctx.fill();
                ctx.closePath();
 
                ctx.fillStyle = 'black';
               
               // The arg is an html element that has already been converted from svg, so this looks like shit
-               ctx.drawImage(i_arg, x, this.min, 70, this.max-this.min);
+               ctx.drawImage(i_arg, x, this.track.min, 70, this.track.max-this.track.min);
                
                // This takes too long to load, and looks better, but not great.
                //ctx.drawSvg("https://upload.wikimedia.org/wikipedia/commons/a/ac/Musical_notes.svg", x, y, 74, 32);

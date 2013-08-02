@@ -75,6 +75,13 @@ define(
 				return k_labels[m_currentSelectionIndex];
 			};
 
+			myInterface.label = function(id){
+				return k_labels[id];
+			};
+
+			myInterface.currentIndex = function(){
+				return m_currentSelectionIndex;
+			};
 
 			//----------------------------------------------------------------
 			// Initialization

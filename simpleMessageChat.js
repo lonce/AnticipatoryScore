@@ -22,10 +22,6 @@ function registerCallback(name, callback) {
 // messages this server handles from clients
 registerCallback('subscribe', subscribe);
 registerCallback('unsubscribe', unsubscribe);
-//registerCallback('mouseGesture', mouseGesture);
-//registerCallback('beginMouseContourGesture', beginMouseContourGesture);
-//registerCallback('beginMouseEventGesture', beginMouseEventGesture);
-//registerCallback('endMouseGesture', endMouseGesture);
 registerCallback('startTime', startTime);
 
 // Note: for all functions used as callbacks, "this" will be a socket passed to the .call()
@@ -51,9 +47,6 @@ function subscribe(rm) {
 }
 
 
-        
-
-
 function unsubscribe(rm) {
     var ws = this;
     if (rm != ''){
@@ -64,37 +57,16 @@ function unsubscribe(rm) {
     }
 }
 
-/*
-// basic data exchange method for responding to one socket, sending to rest
-function mouseGesture(data) {
-    roomBroadcast(this.room, this, 'mouseGesture', data);
-}
-
-// basic data exchange method for responding to one socket, sending to rest
-function beginMouseContourGesture(data) {
-    roomBroadcast(this.room, this, 'beginMouseContourGesture', data);
-}
-
-// basic data exchange method for responding to one socket, sending to rest
-function beginMouseEventGesture(data) {
-    roomBroadcast(this.room, this, 'beginMouseEventGesture', data);
-}
-
-// basic data exchange method for responding to one socket, sending to rest
-function endMouseGesture(data) {
-    roomBroadcast(this.room, this, 'endMouseGesture', data);
-}
-
-*/
-function messageRelay(messageName, data){
-    console.log("messageRelay: message name is " + messageName);
-    roomBroadcast(this.room, this, messageName, data);
-}
-
 // When 'ere a client sends this message, the server sends out a new time to all room members
 function startTime() {
     var JStime = Date.now();
     roomBroadcast(this.room, 0, 'startTime', [JStime]); // 0 sender sends to all members in a room
+}
+
+// generic relay for broadcasting all incoming messages to all room members
+function messageRelay(messageName, data){
+    console.log("messageRelay: message name is " + messageName);
+    roomBroadcast(this.room, this, messageName, data);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

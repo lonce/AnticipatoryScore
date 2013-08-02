@@ -10,7 +10,7 @@ define(
                ctx.strokeStyle = m_scoreEvent.color;
 
                ctx.beginPath();
-               ctx.rect(x,this.min,40,this.max-this.min);
+               ctx.rect(x,this.track.min,40,this.track.max-this.track.min);
                ctx.stroke();
                ctx.closePath();
 
