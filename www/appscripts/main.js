@@ -14,9 +14,9 @@ require.config({
 	}
 });
 require(
-	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",  "scoreEvents/pitchEvent", "scoreEvents/rhythmEvent", "scoreEvents/chordEvent",  "scoreEvents/snakeEvent", "scoreEvents/contourEvent",  "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "tabs/snakeTab", "config"],
+	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",   "scoreEvents/rhythmEvent",   "scoreEvents/snakeEvent",  "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "tabs/snakeTab", "config"],
 
-	function (require, comm, utils, touch2Mouse, canvasSlider,  pitchEvent, rhythmEvent, chordEvent, snakeEvent, contourEvent,  tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, snakeTabFactory, config) {
+	function (require, comm, utils, touch2Mouse, canvasSlider,   rhythmEvent,  snakeEvent,   tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, snakeTabFactory, config) {
 
 /*
 		if(config.webketAudioEnabled){
@@ -93,26 +93,34 @@ require(
 		//---------------------------------------------------------------------------
 		// data is [timestamp (relative to "now"), x,y] of mouseContourGesture, and src is the id of the clicking client
 		comm.registerCallback('beginMouseTempoContour', function(data, src) {
-			console.log("got begin tempo contour gesture from the net");
-			current_remoteEvent[src]=contourEvent();
-			current_remoteEvent[src].d=data;
+			console.log("received tempo event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent();  // no label since no tab
+			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Tempo"]];
 			displayElements.push(current_remoteEvent[src]);
 		});
 
 		//---------------------------------------------------------------------------
 		// data is [timestamp (relative to "now"), x,y] of mouseContourGesture, and src is the id of the clicking client
 		comm.registerCallback('beginMouseDynamicsContour', function(data, src) {
-			console.log("got begin tempo contour gesture from the net");
-			current_remoteEvent[src]=contourEvent();
-			current_remoteEvent[src].d=data;
+			console.log("received Dynamics event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent();  // no label since no tab
+			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Dynamics"]];
 			displayElements.push(current_remoteEvent[src]);
 		});
 
@@ -122,13 +130,17 @@ require(
 		comm.registerCallback("chordEvent", function(data, src) {
 			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
-			console.log("received chord event message from source " + current_remoteEvent[src]); 
-			current_remoteEvent[src]=chordEvent(m_cTab.label(data.i));
+			console.log("received snake event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent(m_cTab.label(data.i));
 			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Chord"]];
 			displayElements.push(current_remoteEvent[src]);
 		});
 
@@ -144,11 +156,8 @@ require(
 			current_remoteEvent[src].head=data.head;
 			current_remoteEvent[src].tail=data.tail;
 
-			console.log("snake event received, tail = " + current_remoteEvent[src].tail);
-
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Snake"]];
 			displayElements.push(current_remoteEvent[src]);
 		});
 
@@ -157,12 +166,16 @@ require(
 			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
 			console.log("received pitch event message from source " + current_remoteEvent[src]); 
-			current_remoteEvent[src]=pitchEvent(m_pTab.label(data.i));
+			current_remoteEvent[src]=snakeEvent(m_pTab.label(data.i));
 			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Pitch"]];
 			displayElements.push(current_remoteEvent[src]);
 		});
 
@@ -418,34 +431,35 @@ require(
 
 
 			if (radioSelection==="Tempo"){
-				console.log("initiateScoreGesture: radio selection type is " + radioSelection)
+				y = utils.bound(y, m_track[m_trackNum["Tempo"]].min, m_track[m_trackNum["Tempo"]].max);
+				current_mgesture=snakeEvent();
 
-				current_mgesture=contourEvent();
-				current_mgesture.track=m_track[m_trackNum[radioSelection]];
-				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);
-				console.log("Setting current gesture min to " + current_mgesture.track.min + ", and max to " + current_mgesture.track.max);
-				//current_mgesture.soundbank=soundbank;
-				comm.sendJSONmsg("beginMouseTempoContour", [[t,y,z]]);
+				current_mgesture.head=false;
+				current_mgesture.tail=true;
+				comm.sendJSONmsg("beginMouseTempoContour", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
+
 			} 
 
 			if (radioSelection==="Dynamics"){
-				console.log("initiateScoreGesture: radio selection type is " + radioSelection)
+				y = utils.bound(y, m_track[m_trackNum["Dynamics"]].min, m_track[m_trackNum["Dynamics"]].max);
+				current_mgesture=snakeEvent();
 
-				current_mgesture=contourEvent();
-				current_mgesture.track=m_track[m_trackNum[radioSelection]];
-				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);
-				console.log("Setting current gesture min to " + current_mgesture.track.min + ", and max to " + current_mgesture.track.max);
-				//current_mgesture.soundbank=soundbank;
-				comm.sendJSONmsg("beginMouseDynamicsContour", [[t,y,z]]);
+				current_mgesture.head=false;
+				current_mgesture.tail=true;
+				comm.sendJSONmsg("beginMouseDynamicsContour", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			} 
 
 
 			if (radioSelection==="Pitch"){
 				y = (m_trackNum["Pitch"] && (m_track[m_trackNum["Pitch"]].min + m_track[m_trackNum["Pitch"]].max)/2) || y;
-				current_mgesture=pitchEvent(m_pTab.currentSelection());
-				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex()});
+				current_mgesture=snakeEvent(m_pTab.currentSelection());
+				//comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex()});
+				current_mgesture.head="diamond";
+				current_mgesture.tail=true;
+				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
 			if (radioSelection==="Rhythm"){
@@ -456,8 +470,15 @@ require(
 
 			if (radioSelection==="Chord"){
 				y = (m_trackNum["Chord"] && (m_track[m_trackNum["Chord"]].min + m_track[m_trackNum["Chord"]].max)/2) || y;
-				current_mgesture=chordEvent(m_cTab.currentSelection());
-				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex()});
+				current_mgesture=snakeEvent(m_cTab.currentSelection());
+
+
+				//comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex()});
+				current_mgesture.head="rectangle";
+				current_mgesture.tail=true;
+				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
+
 			}
 
 			if (radioSelection==="Snake"){
