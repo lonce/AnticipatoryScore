@@ -133,6 +133,26 @@ require(
 		});
 
 		//------------------------------------------------------------------------------------
+		comm.registerCallback("snakeEvent", function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+			console.log("received snake event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent(m_sTab.label(data.i));
+			current_remoteEvent[src].d=data.d;
+			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
+			console.log("snake event received, tail = " + current_remoteEvent[src].tail);
+
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			current_remoteEvent[src].track=m_track[m_trackNum["Snake"]];
+			displayElements.push(current_remoteEvent[src]);
+		});
+
+		//------------------------------------------------------------------------------------
 		comm.registerCallback("pitchEvent", function(data, src) {
 			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
@@ -444,12 +464,12 @@ require(
 				//current_mgesture=contourEvent();
 				current_mgesture=snakeEvent(m_sTab.currentSelection());
 				current_mgesture.track=m_track[m_trackNum[radioSelection]];
-				current_mgesture.head=false;
+				current_mgesture.head="circle";
 				current_mgesture.tail=true;
 				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);
 
 				//comm.sendJSONmsg("beginMouseTempoContour", [[t,y,z]]);
-				comm.sendJSONmsg("snakeEvent", {"d":[[t,y,z]], "i":m_sTab.currentIndex()});
+				comm.sendJSONmsg("snakeEvent", {"d":[[t,y,z]], "i":m_sTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
