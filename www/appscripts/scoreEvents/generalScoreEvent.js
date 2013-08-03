@@ -12,6 +12,9 @@ define(
             b: 999999999999999999999999999,  // begin time for this gesture
             e: -999999999999999999999999999, // end tim for this gesture
             color: "FFFFFF",
+            head: "rectangle",                // "diamond", "circle", "rectangle"
+            tail: true,                      // boolean for now     
+            drawID: false,      
  
 
             updateMinTime: function(i_arg){

@@ -38,8 +38,9 @@ text-align:center;
 /*---------------------------------------------------------------- *//* ----------------------------------------------------------------------
   Hide radio button (the round disc)
   we will use just the label to create pushbutton effect
+  NOTICE this depends on having input names that end in "radio"
 */
-input[name=pradio] {
+input[name$="radio"] {
     display:none; 
     margin:10px;
 }
@@ -47,7 +48,7 @@ input[name=pradio] {
   Change the look'n'feel of labels (which are adjacent to radiobuttons).
   Add some margin, padding to label
 */
-input[name=pradio] + label {
+input[name$="radio"] + label {
     display:inline-block;
     margin: 2px;
     padding: 4px 12px;
@@ -58,7 +59,7 @@ input[name=pradio] + label {
  Change background color for label next to checked radio button
  to make it look like highlighted button
 */
-input[name=pradio]:checked + label { 
+input[name$="radio"]:checked + label { 
 	color: black;
 	font-weight: "900";
    background-image: none;
@@ -70,80 +71,4 @@ td
 {
 text-align:center;
 }
-
-/*---------------------------------------------------------------- */
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=rradio] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=rradio] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=rradio]:checked + label { 
-	color: black;
-	fontWeight="900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
-}
-
-/*---------------------------------------------------------------- */
-/* ----------------------------------------------------------------------
-  Hide radio button (the round disc)
-  we will use just the label to create pushbutton effect
-*/
-input[name=cradio] {
-    display:none; 
-    margin:10px;
-}
-/*
-  Change the look'n'feel of labels (which are adjacent to radiobuttons).
-  Add some margin, padding to label
-*/
-input[name=cradio] + label {
-    display:inline-block;
-    margin: 2px;
-    padding: 4px 12px;
-    background-color: #0000FF;
-    border-color: black;
-}
-/*
- Change background color for label next to checked radio button
- to make it look like highlighted button
-*/
-input[name=cradio]:checked + label { 
-	color: black;
-	fontWeight="900";
-   background-image: none;
-    
-    //background-color:#d0d0d0;
-    background-color: #00BB00;
-}
-td
-{
-text-align:center;
-}
-
-/*---------------------------------------------------------------- */
 
