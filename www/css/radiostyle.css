@@ -1,4 +1,9 @@
 
+table, th, td
+{
+border: 1px solid white;
+}
+
 /* ----------------------------------------------------------------------
   Hide radio button (the round disc)
   we will use just the label to create pushbutton effect
@@ -16,7 +21,7 @@ input[name=tabTab] + label {
     margin: 2px;
     padding: 4px 12px;
     background-color: #0000FF;
-    border-color: black;
+
 }
 /*
  Change background color for label next to checked radio button
@@ -26,8 +31,7 @@ input[name=tabTab]:checked + label {
   color: black;
   fontWeight="900";
    background-image: none;
-    
-    //background-color:#d0d0d0;
+
     background-color: #00BB00;
 }
 td

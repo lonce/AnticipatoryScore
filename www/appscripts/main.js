@@ -14,9 +14,9 @@ require.config({
 	}
 });
 require(
-	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",   "scoreEvents/rhythmEvent",   "scoreEvents/snakeEvent",  "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "tabs/snakeTab", "config"],
+	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",   "scoreEvents/rhythmEvent",   "scoreEvents/snakeEvent",  "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "tabs/keyTab", "tabs/snakeTab", "config"],
 
-	function (require, comm, utils, touch2Mouse, canvasSlider,   rhythmEvent,  snakeEvent,   tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, snakeTabFactory, config) {
+	function (require, comm, utils, touch2Mouse, canvasSlider,   rhythmEvent,  snakeEvent,   tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, keyTabFactory, snakeTabFactory, config) {
 
 /*
 		if(config.webketAudioEnabled){
@@ -55,7 +55,8 @@ require(
 		var m_pTab=pitchTabFactory();
 		var m_rTab=rhythmTabFactory();
 		var m_cTab=chordTabFactory();
-		var m_sTab=snakeTabFactory();
+		//var m_sTab=snakeTabFactory();
+		var m_kTab=keyTabFactory();
 
 		var m_tabTab=tabTab(); // the tabs for the panes
 
@@ -145,6 +146,24 @@ require(
 		});
 
 		//------------------------------------------------------------------------------------
+		comm.registerCallback("keyEvent", function(data, src) {
+			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
+
+			console.log("received key event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent(m_kTab.label(data.i));
+			current_remoteEvent[src].d=data.d;
+			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
+			current_remoteEvent[src].updateMinTime();
+			current_remoteEvent[src].updateMaxTime();
+			displayElements.push(current_remoteEvent[src]);
+		});
+
+		//------------------------------------------------------------------------------------
 		comm.registerCallback("snakeEvent", function(data, src) {
 			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 			console.log("received snake event message from source " + current_remoteEvent[src]); 
@@ -181,16 +200,20 @@ require(
 
 		//------------------------------------------------------------------------------------
 		comm.registerCallback("rhythmEvent", function(data, src) {
-			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
 
-			console.log("received rhythm event message from source " + current_remoteEvent[src]); 
-			current_remoteEvent[src]=rhythmEvent(m_rTab.label(data.i));
+			console.log("received rhythm event message from source with data.i = " + data.i); 
+			current_remoteEvent[src]=snakeEvent(m_rTab.label(data.i));
 			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
+
+			current_remoteEvent[src].track=m_track[m_trackNum[data.trackName]];
+			current_remoteEvent[src].head=data.head;
+			current_remoteEvent[src].tail=data.tail;
+
 			current_remoteEvent[src].updateMinTime();
 			current_remoteEvent[src].updateMaxTime();
-			current_remoteEvent[src].track=m_track[m_trackNum["Rhythm"]];
 			displayElements.push(current_remoteEvent[src]);
+
 		});
 
 
@@ -266,9 +289,9 @@ require(
 			"Tempo": 0,
 			"Pitch": 1,
 			"Chord": 2,
-			"Rhythm": 3,
-			"Dynamics": 4,
-			"Snake":5
+			"Key": 3,
+			"Rhythm": 4,
+			"Dynamics":5
 		}
 
 
@@ -332,7 +355,7 @@ require(
  
  			// Draw scrolling sprockets--
  			context.fillStyle = "#999999";
- 			var sTime = (elapsedtime+scoreWindowTimeLength*(2/3))- (elapsedtime+scoreWindowTimeLength*(2/3))%sprocketInterval;
+ 			var sTime = (elapsedtime+scoreWindowTimeLength*(3/4))- (elapsedtime+scoreWindowTimeLength*(3/4))%sprocketInterval;
 			var sPx= time2Px(sTime);
 			while(sPx > 0){ // loop over sprocket times within score window
 				context.fillRect(sPx,0,sprocketWidth,sprocketHeight);
@@ -393,6 +416,16 @@ require(
 			context.lineTo(nowLinePx, theCanvas.height);
 			context.closePath();
 			context.stroke();
+			// dots to separate tracks
+			context.fillStyle = "#FF0000";	
+			for (var i=1;i<numTracks;i++){
+				context.beginPath();
+				context.arc(nowLinePx, m_track[i].min, 2 ,0,2*Math.PI);
+				context.closePath();
+				context.fill();
+			}
+
+
 
 			lastDrawTime=elapsedtime;
 
@@ -458,38 +491,51 @@ require(
 				//comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex()});
 				current_mgesture.head="diamond";
 				current_mgesture.tail=true;
-				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
 			if (radioSelection==="Rhythm"){
 				y = (m_trackNum["Rhythm"] && (m_track[m_trackNum["Rhythm"]].min + m_track[m_trackNum["Rhythm"]].max)/2) || y;
-				current_mgesture=rhythmEvent(m_rTab.currentSelection());
-				comm.sendJSONmsg("rhythmEvent", {"d":[[t,y,z]], "i":m_rTab.currentIndex()});
+				current_mgesture=snakeEvent(m_rTab.currentSelection());
+				current_mgesture.head="image";
+				current_mgesture.tail=true;
+				comm.sendJSONmsg("rhythmEvent", {"d":[[t,y,z]], "i":m_rTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
 			if (radioSelection==="Chord"){
 				y = (m_trackNum["Chord"] && (m_track[m_trackNum["Chord"]].min + m_track[m_trackNum["Chord"]].max)/2) || y;
 				current_mgesture=snakeEvent(m_cTab.currentSelection());
 
-
-				//comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex()});
 				current_mgesture.head="rectangle";
 				current_mgesture.tail=true;
+
 				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 
 			}
 
+			if (radioSelection==="Key"){
+				y = (m_trackNum["Key"] && (m_track[m_trackNum["Key"]].min + m_track[m_trackNum["Key"]].max)/2) || y;
+				current_mgesture=snakeEvent(m_kTab.currentSelection());
+
+				current_mgesture.head="rectangle";
+				current_mgesture.tail=true;
+
+				comm.sendJSONmsg("keyEvent", {"d":[[t,y,z]], "i":m_kTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
+			}
+
+
 			if (radioSelection==="Snake"){
-				//current_mgesture=contourEvent();
+				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);				
 				current_mgesture=snakeEvent(m_sTab.currentSelection());
+
 				current_mgesture.track=m_track[m_trackNum[radioSelection]];
 				current_mgesture.head="circle";
 				current_mgesture.tail=true;
-				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);
 
-				//comm.sendJSONmsg("beginMouseTempoContour", [[t,y,z]]);
 				comm.sendJSONmsg("snakeEvent", {"d":[[t,y,z]], "i":m_sTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}

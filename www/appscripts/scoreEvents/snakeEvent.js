@@ -10,6 +10,7 @@ define(
          m_scoreEvent.draw = function(ctx, time2Px, nowishP){
 
                var dispPx=time2Px(this.d[0][0]);
+               ctx.fillStyle = this.color;
 
 
  /*
@@ -26,7 +27,7 @@ define(
                }
 
                if (this.drawID){
-                  ctx.fillStyle = this.color;
+
                   ctx.fillText(this.s, dispPx, this.d[0][1]);
 
                   ctx.beginPath();
@@ -83,8 +84,8 @@ define(
                         //ctx.strokeStyle = "#FF0000"; 
                         ctx.lineWidth =1;
                         ctx.beginPath();             
-                        ctx.moveTo(config.nowLinePx-4, m_nowVal);
-                        ctx.lineTo(config.nowLinePx+4, m_nowVal);
+                        ctx.moveTo(config.nowLinePx-6, m_nowVal);
+                        ctx.lineTo(config.nowLinePx+6, m_nowVal);
                         ctx.stroke();
                         ctx.closePath();
 
@@ -92,31 +93,15 @@ define(
                }
             };
 
-/* 
-            // just draw cross hair on now line at the value of end of contour...
-            m_scoreEvent.drawAtPixel =  function(ctx, xval){
 
-               drawHead(ctx, xval);
 
-               if (m_nowVal != null){
-                     ctx.strokeStyle = this.color;
-                     ctx.lineWidth =1;
-                     ctx.beginPath();             
-                     ctx.moveTo(config.nowLinePx-4, m_nowVal);
-                     ctx.lineTo(config.nowLinePx+4, m_nowVal);
-                     ctx.stroke();
-                     ctx.closePath();
-               }    
-            };
-*/
-
-         var drawHead = function (ctx, x){
+            var drawHead = function (ctx, x){
                var x=Math.max(x,0);
 
                var h=m_scoreEvent.track.max-m_scoreEvent.track.min;
-              var  w=h;
-              var  r = w/2;
-              var y=(m_scoreEvent.track.max+m_scoreEvent.track.min)/2;
+               var w=h;
+               var r = w/2;
+               var y=(m_scoreEvent.track.max+m_scoreEvent.track.min)/2;
 
                ctx.fillStyle = m_scoreEvent.color;
                ctx.strokeStyle = m_scoreEvent.color;
@@ -126,6 +111,7 @@ define(
                   ctx.rect(x,m_scoreEvent.track.min,40,m_scoreEvent.track.max-m_scoreEvent.track.min);
                   ctx.stroke();
                   ctx.closePath();
+                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
                } else if (m_scoreEvent.head === "diamond"){
                   ctx.beginPath();
                   ctx.moveTo(x, y);
@@ -135,17 +121,23 @@ define(
                   ctx.lineTo(x, y);
                   ctx.stroke();
                   ctx.closePath();
+                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
                } else if (m_scoreEvent.head === "circle"){
                   ctx.beginPath();
                   ctx.arc(x+r,y,r,0,2*Math.PI);
                   ctx.stroke();
                   ctx.closePath();
-
-               }
-
-
-               ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
-
+                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
+               } else if (m_scoreEvent.head === "image"){
+                  ctx.beginPath();
+                  ctx.fillStyle = 'white';
+                  ctx.rect(x,m_scoreEvent.track.min,70,m_scoreEvent.track.max-m_scoreEvent.track.min);
+                  ctx.fill();
+                  ctx.closePath();
+                  ctx.fillStyle = 'black';
+                  // The arg is an html element that has already been converted from svg, so this looks like shit
+                  ctx.drawImage(i_arg, x, m_scoreEvent.track.min, 70, m_scoreEvent.track.max-m_scoreEvent.track.min);
+           }
 
                ctx.beginPath();
                ctx.arc(x,(m_scoreEvent.track.max+m_scoreEvent.track.min)/2 ,1,0,2*Math.PI);
@@ -153,8 +145,6 @@ define(
                ctx.fill();            
          }
 
-
-         
    		return m_scoreEvent;
       }
 });

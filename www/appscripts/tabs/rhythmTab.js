@@ -11,7 +11,7 @@ define(
  			var k_labels=[]; // assigned below
 
  			//------------------------------------
- 			var imagesFileName=["images/rhythm1.png", "images/rhythm2.jpg", "images/rhythm3.jpg", "images/test.svg"];
+ 			var imagesFileName=["images/rhythm1.png", "images/rhythm2.jpg", "images/rhythm3.jpg", "images/rhythm4.jpg"];
 
  			for(var i=0;i<imagesFileName.length;i++){
  				k_labels[i] = new Image(); 

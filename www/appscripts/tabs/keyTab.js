@@ -3,12 +3,12 @@ define(
 	["utils"],
 	function (utils) {
 		return function(){
- 			var docDiv="chordTab"; // already on index.html
- 			var k_inputElmtName="cradio";
+ 			var docDiv="keyTab"; // already on index.html
+ 			var k_inputElmtName="kradio";
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
- 			var numRows=2;
- 			var numCols=3;
- 			var k_labels=["I", "ii", "IV", "V", "vi"];
+ 			var numRows=1;
+ 			var numCols=2;
+ 			var k_labels=["A", "E"];
 
 
  			var myInterface={};
@@ -61,7 +61,6 @@ define(
 			// Interface methods
 
 			myInterface.SelectRadio = function(pnum){
-				pnum=Math.round(pnum);
 				console.log("pnum is " + pnum + ", and k_inputElmtName = " + k_inputElmtName);
 				radioButtonArray[pnum].checked = true;
 				m_currentSelectionIndex=pnum; 

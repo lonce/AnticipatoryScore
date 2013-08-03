@@ -8,8 +8,8 @@ define(
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
  			var numRows=2;
  			var numCols=3;
- 			var k_labels=["Dynamics",    "Tempo",    "Pitch",    "Rhythm",     "Chord" , "Snake"];
-			var k_tabPane=["dynamicsTab", "tempoTab", "pitchTab", "rhythmTab",  "chordTab", "snakeTab" ];
+ 			var k_labels=["Tempo", "Pitch", "Chord", "Key", "Rhythm", "Dynamics" ];
+			var k_tabPane=["tempoTab", "pitchTab",  "chordTab", "keyTab", "rhythmTab", "dynamicsTab"];
 
 
  			var myInterface={};
