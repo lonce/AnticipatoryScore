@@ -109,16 +109,20 @@ function receiveJSONmsg(data, flags) {
 
 // Sends a pulse to all members of all rooms at the pulsePeriod
 var pulsePeriod=1000;
+
 function emitPulse() {
     var JStime = Date.now();
     var rm;
     for (rm in rooms){
         rooms[rm].forEach(function (ws) {
+            console.log("pulse: " + JStime);
             sendJSONmsg(ws, 'metroPulse', [JStime], 0);
         });
     }
+    console.log("pulse " + JStime);
 }
 setInterval(emitPulse, pulsePeriod);
+
 
 
 //****************************************************************************

@@ -65,10 +65,16 @@ define(
 				m_currentSelectionIndex=pnum; 
 
 				setTab(k_tabPane[pnum]);  // make the corresponding pane visible
+
 			}
 
+
 			myInterface.handleClick = function(object){
-				myInterface.SelectRadio(object.target.value);
+				myInterface.SelectRadio(object.target.value, object);
+
+				console.log("YAYA");
+				myInterface.fire(object);
+
 			}
 
 			myInterface.currentSelection = function(){
@@ -104,6 +110,7 @@ define(
 			};
 
 
+			utils.eventuality(myInterface);
 			return myInterface;
 		}
 	}

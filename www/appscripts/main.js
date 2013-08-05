@@ -218,10 +218,24 @@ require(
 
 
 		//---------------------------------------------------------------------------
+		var serverPulseCount=0;
+		var timeShiftCorrection=0;
 		comm.registerCallback('metroPulse', function(data, src) {
 			serverTime=data;
 			// check server elapsed time again client elapsed time
+			//console.log("serverPulsecount " + serverPulseCount);
 			//console.log("on metropulse, server elapsed time = " + (serverTime-serverTimeOrigin) +  ", and client elapsed = "+ (Date.now() - timeOrigin ));
+			serverPulseCount++;
+
+
+			var t_myMachineTime = Date.now();
+			var tso = t_myMachineTime-timeOrigin;
+			var diff = (serverPulseCount - tso/1000); 
+
+			console.log("tso = " + tso + ", and serverPulseCount = " + serverPulseCount + ", diff is " + diff);
+
+			timeShiftCorrection=diff/600; // divided by the number of frames we want to distrubute the correction over
+
 		});
 		//---------------------------------------------------------------------------
 		comm.registerCallback('startTime', function(data) {
@@ -231,6 +245,7 @@ require(
 			serverTimeOrigin=data[0];
 			m_lastDisplayTick=0;
 			displayElements=[];		
+			serverPulseCount=0;
 		});
 		//---------------------------------------------------------------------------
 		// Just make a color for displaying future events from the client with the src ID
@@ -261,9 +276,10 @@ require(
 		var mouseY;
 		context.font="9px Arial";
 
-		var scoreWindowTimeLength=30000; //ms
+		var scoreWindowTimeLength=50000; //ms
+		var basePixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
-		var pxPerSec=pixelShiftPerMs*1000;
+		//var pxPerSec=pixelShiftPerMs*1000;
 		var nowLinePx=theCanvas.width/4;
 		config.nowLinePx=nowLinePx;
 
@@ -273,7 +289,7 @@ require(
 
 		var sprocketHeight=2;
 		var sprocketWidth=1;
-		var sprocketInterval=1000; //ms
+		var sprocketInterval=5000; //ms
 
 		var numTracks = 6;
 		var trackHeight=theCanvas.height / numTracks;
@@ -293,6 +309,17 @@ require(
 			"Rhythm": 4,
 			"Dynamics":5
 		}
+
+		var m_currentTrackSelection=null;
+
+		var getPixelTrackNum = function(y) {
+			for (var i=0;i<numTracks;i++){
+				if (y< m_track[i].max){
+					return i;
+				}
+			}
+		}
+
 
 
 		var time2PxOLD=function(time, elapsedTime){ // time measured since timeOrigin
@@ -353,14 +380,9 @@ require(
 			}
 			//---------------------------------------------------------------
  
- 			// Draw scrolling sprockets--
- 			context.fillStyle = "#999999";
- 			var sTime = (elapsedtime+scoreWindowTimeLength*(3/4))- (elapsedtime+scoreWindowTimeLength*(3/4))%sprocketInterval;
-			var sPx= time2Px(sTime);
-			while(sPx > 0){ // loop over sprocket times within score window
-				context.fillRect(sPx,0,sprocketWidth,sprocketHeight);
-				context.fillRect(sPx,theCanvas.height-sprocketHeight,sprocketWidth,sprocketHeight);
-				sPx-=pixelShiftPerMs*sprocketInterval;
+			if (m_currentTrackSelection != null) {
+				context.fillStyle = "#330033";
+				context.fillRect(0,m_track[m_currentTrackSelection].min,theCanvas.width,m_track[m_currentTrackSelection].max-m_track[m_currentTrackSelection].min);
 			}
 
 			//------------
@@ -373,6 +395,17 @@ require(
 				context.lineTo(theCanvas.width, m_track[i].min);
 				context.stroke();
 				context.closePath();
+			}
+
+
+ 			// Draw scrolling sprockets--
+ 			context.fillStyle = "#999999";
+ 			var sTime = (elapsedtime+scoreWindowTimeLength*(3/4))- (elapsedtime+scoreWindowTimeLength*(3/4))%sprocketInterval;
+			var sPx= time2Px(sTime);
+			while(sPx > 0){ // loop over sprocket times within score window
+				context.fillRect(sPx,0,sprocketWidth,sprocketHeight);
+				context.fillRect(sPx,theCanvas.height-sprocketHeight,sprocketWidth,sprocketHeight);
+				sPx-=pixelShiftPerMs*sprocketInterval;
 			}
 
 
@@ -461,7 +494,7 @@ require(
 			var t = Date.now()-timeOrigin + px2Time(x);		
 
 			var radioSelection=m_tabTab.currentSelection();
-
+			
 
 			if (radioSelection==="Tempo"){
 				y = utils.bound(y, m_track[m_trackNum["Tempo"]].min, m_track[m_trackNum["Tempo"]].max);
@@ -509,7 +542,7 @@ require(
 				current_mgesture=snakeEvent(m_cTab.currentSelection());
 
 				current_mgesture.head="rectangle";
-				current_mgesture.tail=true;
+				current_mgesture.tail=false;
 
 				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
@@ -521,24 +554,12 @@ require(
 				current_mgesture=snakeEvent(m_kTab.currentSelection());
 
 				current_mgesture.head="rectangle";
-				current_mgesture.tail=true;
+				current_mgesture.tail=false;
 
 				comm.sendJSONmsg("keyEvent", {"d":[[t,y,z]], "i":m_kTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
-
-			if (radioSelection==="Snake"){
-				y = utils.bound(y, current_mgesture.track.min, current_mgesture.track.max);				
-				current_mgesture=snakeEvent(m_sTab.currentSelection());
-
-				current_mgesture.track=m_track[m_trackNum[radioSelection]];
-				current_mgesture.head="circle";
-				current_mgesture.tail=true;
-
-				comm.sendJSONmsg("snakeEvent", {"d":[[t,y,z]], "i":m_sTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
-				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
-			}
 
 
 			current_mgesture.d=[[t,y,z]];
@@ -579,9 +600,22 @@ require(
 			var x = m.x;
 			var y = m.y;
 
-			initiateScoreGesture(x, y);
+			var clickedTrack=getPixelTrackNum(y);
+			console.log("clicked track " + clickedTrack + " and current tabTab index is " + m_tabTab.currentIndex());
+
+			if (clickedTrack === Number(m_tabTab.currentIndex())){
+				initiateScoreGesture(x, y);				
+			} else{
+				console.log("selecting new track");
+				m_currentTrackSelection=clickedTrack;
+				m_tabTab.SelectRadio(m_currentTrackSelection);
+			}
+
 			last_mousemove_event=e;
 		}
+
+
+		m_tabTab.on('click', function(){console.log("YOYO"); m_currentTrackSelection =m_tabTab.currentIndex(); }); // Crockford's eventuality
 
 		function onMouseUp(e){
 			current_mgesture && endContour();
