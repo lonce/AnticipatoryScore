@@ -2,13 +2,14 @@
 define(
 	["utils"],
 	function (utils) {
-		return function(){
- 			var docDiv="chordTab"; // already on index.html
- 			var k_inputElmtName="cradio";
+		return function(i_docDiv, i_eName, i_labelarray){
+ 			var docDiv=i_docDiv; // already on index.html
+ 			var k_inputElmtName=i_eName;
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
- 			var numRows=2;
+ 			var k_labels=i_labelarray;
+
+ 			var numRows=parseInt(Math.ceil(i_labelarray.length/3));
  			var numCols=3;
- 			var k_labels=["I", "ii", "IV", "V", "vi"];
 
 
  			var myInterface={};

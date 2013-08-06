@@ -14,7 +14,8 @@ define(
             color: "FFFFFF",
             head: "rectangle",                // "diamond", "circle", "rectangle"
             tail: true,                      // boolean for now     
-            drawID: false,      
+            drawID: false, 
+            font: "12px Arial",     
  
 
             updateMinTime: function(i_arg){

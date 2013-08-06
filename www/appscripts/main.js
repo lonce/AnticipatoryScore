@@ -9,14 +9,14 @@
 
 require.config({
 	paths: {
-		"jsaSound": "http://animatedsoundworks.com:8001" // for have sound served from animatedsoundworks
+		//"jsaSound": "http://animatedsoundworks.com:8001" // for have sound served from animatedsoundworks
 		//"jsaSound": ".." // if al jsaSound project directories (jsaOpCodes, jsaCore, jsaModels) are local
 	}
 });
 require(
-	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",   "scoreEvents/rhythmEvent",   "scoreEvents/snakeEvent",  "tabs/tabTab", "tabs/pitchTab", "tabs/rhythmTab", "tabs/chordTab", "tabs/keyTab", "tabs/snakeTab", "config"],
+	["require", "comm", "utils", "touch2Mouse", "canvasSlider2",   "scoreEvents/rhythmEvent",   "scoreEvents/snakeEvent",  "tabs/tabTab",  "tabs/rhythmTab",  "tabs/keyTab", "tabs/snakeTab", "tabs/genericTab", "config"],
 
-	function (require, comm, utils, touch2Mouse, canvasSlider,   rhythmEvent,  snakeEvent,   tabTab, pitchTabFactory, rhythmTabFactory, chordTabFactory, keyTabFactory, snakeTabFactory, config) {
+	function (require, comm, utils, touch2Mouse, canvasSlider,   rhythmEvent,  snakeEvent,   tabTab, rhythmTabFactory,  keyTabFactory, snakeTabFactory, genericTabFactory, config) {
 
 /*
 		if(config.webketAudioEnabled){
@@ -52,17 +52,15 @@ require(
 
 
 		// Create the tabPanes
-		var m_pTab=pitchTabFactory();
+		var m_pTab=genericTabFactory("pitchTab", "pradio", ["c#", "d#", "f", "g#", "a#" ]);
 		var m_rTab=rhythmTabFactory();
-		var m_cTab=chordTabFactory();
-		//var m_sTab=snakeTabFactory();
+		//var m_cTab=chordTabFactory();
+		var m_cTab=genericTabFactory("chordTab", "cradio", ["I", "ii", "IV", "V", "vi"]);
+		var m_oTab=genericTabFactory("orchTab", "oradio", ["00", "1", "2", "3", "4", "1/A", "2/A", "3/A", "4/A", "All"]);
 		var m_kTab=keyTabFactory();
 
 		var m_tabTab=tabTab(); // the tabs for the panes
 
-
-
-		//var m_playState={}; // keeps track of the last display element of a given type to cross the "now" line. 		
 
 		//---------------------------------------------------------------------------
 		// init is called just after a client navigates to the web page
@@ -164,10 +162,10 @@ require(
 		});
 
 		//------------------------------------------------------------------------------------
-		comm.registerCallback("snakeEvent", function(data, src) {
+		comm.registerCallback("orchEvent", function(data, src) {
 			//current_remoteEvent[src]={type: 'mouseEventSpray', b: data[0][0], e: data[data.length-1][0], d: data, s: src};
-			console.log("received snake event message from source " + current_remoteEvent[src]); 
-			current_remoteEvent[src]=snakeEvent(m_sTab.label(data.i));
+			console.log("received orch event message from source " + current_remoteEvent[src]); 
+			current_remoteEvent[src]=snakeEvent(m_oTab.label(data.i));
 			current_remoteEvent[src].d=data.d;
 			current_remoteEvent[src].s=src;
 
@@ -276,7 +274,7 @@ require(
 		var mouseY;
 		context.font="9px Arial";
 
-		var scoreWindowTimeLength=50000; //ms
+		var scoreWindowTimeLength=30000; //ms
 		var basePixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		//var pxPerSec=pixelShiftPerMs*1000;
@@ -289,26 +287,27 @@ require(
 
 		var sprocketHeight=2;
 		var sprocketWidth=1;
-		var sprocketInterval=5000; //ms
+		var sprocketInterval=1000; //ms
 
-		var numTracks = 6;
+
+		var m_trackName=["Tempo", "Pitch", "Chord", "Key", "Rhythm", "Dynamics", "Orchestration" ];
+		var numTracks = m_trackName.length;
 		var trackHeight=theCanvas.height / numTracks;
+
+		m_trackNum={}; // map name to number
+
+
 		var m_track =[]; // array of {min: max:} values (in pixels) that devide each track on the score
 		for (var i=0;i<numTracks;i++){
 			m_track[i]={};
 			m_track[i].min=i*trackHeight;
 			m_track[i].max=(i+1)*trackHeight;
 			m_track[i].state=null;
+			m_track[i].name=m_trackName[i];
+			//--------------------------
+			m_trackNum[m_trackName[i]]=i;
 		}
 
-		var m_trackNum = {
-			"Tempo": 0,
-			"Pitch": 1,
-			"Chord": 2,
-			"Key": 3,
-			"Rhythm": 4,
-			"Dynamics":5
-		}
 
 		var m_currentTrackSelection=null;
 
@@ -408,7 +407,6 @@ require(
 				sPx-=pixelShiftPerMs*sprocketInterval;
 			}
 
-
 			//------------		
 			// Draw the musical display elements 
 			var p_beg; 
@@ -420,16 +418,14 @@ require(
 				if (nowishP(dispe.b)){					
 					explosion(time2Px(dispe.b), dispe.d[0][1], 5, "#FF0000", 3, "#FFFFFF");
 
-					//m_playState[dispe.type]=dispe;
 					dispe.track.state = dispe;
-					//console.log(dispe.type + " has a new state element");
 					console.log("track " + dispe.track + " has a new state element");
 				} 
 
 				// If its moved out of our score window, delete it from the display list
 				p_beg=time2Px(displayElements[dispElmt].b);
 
-				// if you are the current play state element of your type
+				// if you are not the current play state element of your type
 				if ((p_beg < nowLinePx) && (dispe.track.state != displayElements[dispElmt])){
 					// remove event from display list
 					displayElements.splice(dispElmt,1);
@@ -502,7 +498,9 @@ require(
 
 				current_mgesture.head=false;
 				current_mgesture.tail=true;
-				comm.sendJSONmsg("beginMouseTempoContour", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture.color="#00FF00";  // local color is always this
+
+				comm.sendJSONmsg("beginMouseTempoContour", {"d":[[t,y,z]], "i":null, "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 
 			} 
@@ -513,7 +511,8 @@ require(
 
 				current_mgesture.head=false;
 				current_mgesture.tail=true;
-				comm.sendJSONmsg("beginMouseDynamicsContour", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture.color="#00FF00";  // local color is always this
+				comm.sendJSONmsg("beginMouseDynamicsContour", {"d":[[t,y,z]], "i":null, "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			} 
 
@@ -522,8 +521,9 @@ require(
 				y = (m_trackNum["Pitch"] && (m_track[m_trackNum["Pitch"]].min + m_track[m_trackNum["Pitch"]].max)/2) || y;
 				current_mgesture=snakeEvent(m_pTab.currentSelection());
 				//comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex()});
-				current_mgesture.head="diamond";
+				current_mgesture.head="circle";
 				current_mgesture.tail=true;
+				current_mgesture.color="#00FF00";  // local color is always this
 				comm.sendJSONmsg("pitchEvent", {"d":[[t,y,z]], "i":m_pTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
@@ -533,6 +533,7 @@ require(
 				current_mgesture=snakeEvent(m_rTab.currentSelection());
 				current_mgesture.head="image";
 				current_mgesture.tail=true;
+				current_mgesture.color="#00FF00";  // local color is always this
 				comm.sendJSONmsg("rhythmEvent", {"d":[[t,y,z]], "i":m_rTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
@@ -541,8 +542,9 @@ require(
 				y = (m_trackNum["Chord"] && (m_track[m_trackNum["Chord"]].min + m_track[m_trackNum["Chord"]].max)/2) || y;
 				current_mgesture=snakeEvent(m_cTab.currentSelection());
 
-				current_mgesture.head="rectangle";
+				current_mgesture.head="diamond";
 				current_mgesture.tail=false;
+				current_mgesture.color="#00FF00";  // local color is always this
 
 				comm.sendJSONmsg("chordEvent", {"d":[[t,y,z]], "i":m_cTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
@@ -555,17 +557,29 @@ require(
 
 				current_mgesture.head="rectangle";
 				current_mgesture.tail=false;
+				current_mgesture.color="#00FF00";  // local color is always this
 
 				comm.sendJSONmsg("keyEvent", {"d":[[t,y,z]], "i":m_kTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
 				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
 			}
 
+			if (radioSelection==="Orchestration"){
+				y = (m_trackNum["Orchestration"] && (m_track[m_trackNum["Orchestration"]].min + m_track[m_trackNum["Orchestration"]].max)/2) || y;
+				current_mgesture=snakeEvent(m_oTab.currentSelection());
+
+				current_mgesture.head="rectangle";
+				current_mgesture.tail=false;
+				current_mgesture.color="#FF00FF";  // local color is always this
+				current_mgesture.font="16px Arial";
+
+				comm.sendJSONmsg("orchEvent", {"d":[[t,y,z]], "i":m_oTab.currentIndex(), "trackName":radioSelection, "head":current_mgesture.head, "tail": current_mgesture.tail  });
+				current_mgesture_2send={type: 'mouseContourGesture', d: [], s: myID}; // do I need to add the source here??
+			}
 
 
 			current_mgesture.d=[[t,y,z]];
 			current_mgesture.s=myID;
 
-			current_mgesture.color="#00FF00";  // local color is always this
 			current_mgesture.track=m_track[m_trackNum[radioSelection]];
 			current_mgesture.updateMinTime();
 			current_mgesture.updateMaxTime();

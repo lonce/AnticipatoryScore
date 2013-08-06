@@ -64,6 +64,18 @@ define(
                   // "turn around" the end
                   //ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]-this.d[n-1][2]/2);
                   ctx.lineTo(time2Px(this.d[n-1][0]), this.d[n-1][1]);
+
+
+                  // "Stick" to the now line
+                  //var stickto = config.nowLinePx;
+                  /*
+                  var stickto=10;
+                  if (time2Px(this.d[n-1][0]) < stickto){
+                     ctx.lineTo(stickto, this.d[n-1][1]);
+                     ctx.lineTo(stickto, this.track.max);
+                  }
+                  */
+
                   // go backwards at the line width
                   for(var n=this.d.length-1;n>=0; n--){
                      //ctx.lineTo(time2Px(this.d[n][0]), this.d[n][1]-this.d[n][2]/2);
@@ -78,9 +90,19 @@ define(
                   ctx.globalAlpha = 1;  
 
 
+
+                  if (time2Px(this.d[this.d.length-1][0]) < config.nowLinePx){
+                        ctx.beginPath();
+                        ctx.rect(config.nowLinePx-6, this.d[this.d.length-1][1], 12, this.track.max-this.d[this.d.length-1][1]);
+                        ctx.closePath();
+                        ctx.stroke();  
+                        ctx.globalAlpha = 0.25;
+                        ctx.fill(); 
+                        ctx.globalAlpha = 1;
+                  }
+                  
                   // draw cross-hair on now line of last value to cross it              
                   if (m_nowVal != null){
-
                         //ctx.strokeStyle = "#FF0000"; 
                         ctx.lineWidth =1;
                         ctx.beginPath();             
@@ -88,8 +110,8 @@ define(
                         ctx.lineTo(config.nowLinePx+6, m_nowVal);
                         ctx.stroke();
                         ctx.closePath();
-
                   }    
+                  
                }
             };
 
@@ -99,19 +121,22 @@ define(
                var x=Math.max(x,0);
 
                var h=m_scoreEvent.track.max-m_scoreEvent.track.min;
-               var w=h;
-               var r = w/2;
+               var r = h/2;
+               var w=1.2*h;
                var y=(m_scoreEvent.track.max+m_scoreEvent.track.min)/2;
 
                ctx.fillStyle = m_scoreEvent.color;
                ctx.strokeStyle = m_scoreEvent.color;
+               ctx.font = m_scoreEvent.font;
+               ctx.textAlign="center";
+               ctx.textBaseline="middle"; 
 
                if (m_scoreEvent.head === "rectangle"){
                   ctx.beginPath();
-                  ctx.rect(x,m_scoreEvent.track.min,40,m_scoreEvent.track.max-m_scoreEvent.track.min);
+                  ctx.rect(x,m_scoreEvent.track.min,w,m_scoreEvent.track.max-m_scoreEvent.track.min);
                   ctx.stroke();
                   ctx.closePath();
-                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
+                  ctx.fillText(i_arg, x+w/2, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
                } else if (m_scoreEvent.head === "diamond"){
                   ctx.beginPath();
                   ctx.moveTo(x, y);
@@ -121,13 +146,13 @@ define(
                   ctx.lineTo(x, y);
                   ctx.stroke();
                   ctx.closePath();
-                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
+                  ctx.fillText(i_arg, x+w/2, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
                } else if (m_scoreEvent.head === "circle"){
                   ctx.beginPath();
                   ctx.arc(x+r,y,r,0,2*Math.PI);
                   ctx.stroke();
                   ctx.closePath();
-                  ctx.fillText(i_arg, x+w/2 -5, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
+                  ctx.fillText(i_arg, x+w/2, (m_scoreEvent.track.max+m_scoreEvent.track.min)/2);
                } else if (m_scoreEvent.head === "image"){
                   ctx.beginPath();
                   ctx.fillStyle = 'white';

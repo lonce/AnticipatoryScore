@@ -6,8 +6,8 @@ define(
  			var docDiv="rhythmTab"; // already on index.html
  			var k_inputElmtName="rradio";
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
- 			var numRows=4;
- 			var numCols=1;
+ 			var numRows=2;
+ 			var numCols=2;
  			var k_labels=[]; // assigned below
 
  			//------------------------------------

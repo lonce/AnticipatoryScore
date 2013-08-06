@@ -6,10 +6,10 @@ define(
  			var docDiv="radioSelectDiv"; // already on index.html
  			var k_inputElmtName="tabTab";
  			var radioButtonArray = document.getElementsByName(k_inputElmtName); 
- 			var numRows=2;
+ 			var numRows=3;
  			var numCols=3;
- 			var k_labels=["Tempo", "Pitch", "Chord", "Key", "Rhythm", "Dynamics" ];
-			var k_tabPane=["tempoTab", "pitchTab",  "chordTab", "keyTab", "rhythmTab", "dynamicsTab"];
+ 			var k_labels=["Tempo", "Pitch", "Chord", "Key", "Rhythm", "Dynamics", "Orchestration" ];
+			var k_tabPane=["tempoTab", "pitchTab",  "chordTab", "keyTab", "rhythmTab", "dynamicsTab", "orchTab"];
 
 
  			var myInterface={};
