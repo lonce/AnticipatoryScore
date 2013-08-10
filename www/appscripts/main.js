@@ -56,7 +56,7 @@ require(
 		var m_rTab=rhythmTabFactory();
 		//var m_cTab=chordTabFactory();
 		var m_cTab=genericTabFactory("chordTab", "cradio", ["I", "ii", "IV", "V", "vi"]);
-		var m_oTab=genericTabFactory("orchTab", "oradio", ["00", "1", "2", "3", "4", "1/A", "2/A", "3/A", "4/A", "All"]);
+		var m_oTab=genericTabFactory("orchTab", "oradio", ["00", "1", "2", "3", "4", "5", "6", "7", "8", "9", "1/A", "2/A", "3/A", "4/A", "All"]);
 		var m_kTab=keyTabFactory();
 
 		var m_tabTab=tabTab(); // the tabs for the panes
