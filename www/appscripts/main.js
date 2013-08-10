@@ -274,7 +274,7 @@ require(
 		var mouseY;
 		context.font="9px Arial";
 
-		var scoreWindowTimeLength=30000; //ms
+		var scoreWindowTimeLength=40000; //ms
 		var basePixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		var pixelShiftPerMs=theCanvas.width/(scoreWindowTimeLength);
 		//var pxPerSec=pixelShiftPerMs*1000;
@@ -387,8 +387,14 @@ require(
 			//------------
 			//draw track lines
 			context.strokeStyle = "#555555";	
-			context.lineWidth =1;			
-			for (var i=1;i<numTracks;i++){
+			context.lineWidth =1;
+				context.textBaseline="middle"; 
+				context.fillStyle = "#303030";
+				context.font = "20px Arial"
+				context.textAlign="right";
+			
+			for (var i=0;i<numTracks;i++){
+					context.fillText(m_track[i].name, theCanvas.width, (m_track[i].max+m_track[i].min)/2);
 				context.beginPath();
 				context.moveTo(0, m_track[i].min);
 				context.lineTo(theCanvas.width, m_track[i].min);
