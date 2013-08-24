@@ -1,0 +1,154 @@
+body
+{
+	background-color:black;
+	color:white;
+}
+h3 {
+	color:white;
+/*	-webkit-user-select: none; */
+	text-align: center
+}
+
+img {
+	background-color:white;
+	/* height:400px; */
+	/* width:500px;  */
+}
+
+#app{
+	width: 1024px;
+	height:768px;	
+	//overflow: hidden;
+}
+
+#display{
+	width: 1024px;
+	height:768px;	
+
+}
+
+#timeLabelDiv{
+	color:white;
+	-webkit-user-select: none;
+	width: 900px;
+	text-align: center;
+}
+
+#timeDisplayDiv{
+color:white;
+	-webkit-user-select: none;
+	width: 900px;
+	text-align: center;	
+}
+/* ----------------------------------------------------------------- */
+#subapp{
+	width: 1024px;
+	height:614px;
+	border:2px solid #FFFFFF;
+}
+/* http://jsfiddle.net/ArondeParon/SPjsf/15/ */
+/* http://css-infos.net/property/-webkit-appearance */
+#sliderSpan {
+
+	-webkit-user-select: none;
+	color:blue;
+	text-align: center;	
+	border:1px solid #0000FF;
+    width: 30px;
+	height:614px;
+    margin-right:2px;
+    float:left;
+    display:none;
+}
+#slidercanvas1{
+
+	-webkit-user-select: none;
+	border:1px solid #FF00FF;
+    width: 20px;
+    height:614px;
+    /* float:left; */
+    display:none;
+}
+.scoreSpan{
+
+}
+
+#score {
+	/* -webkit-user-select: none; */
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 716px;
+	height: 614px;
+	border:3px solid #0000FF;
+
+}
+
+#radioSelect {
+
+}
+#superTabDiv{
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 286px;
+	height:614px;	
+	vertical-align:top;
+	display: inline-block; 
+	float:right;
+}
+#radioSelectDiv{
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 286px;
+	height:122px;	
+	vertical-align:top;
+	display: inline-block;  
+	border:1px solid #00FF00;
+}
+
+
+.myTabs{
+	border:1px solid #00FF00;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 286px;
+	height:491px;
+	vertical-align:top;
+	display: none;  // set in code to "none" or "inline-block"
+
+	//float:right;
+
+}
+#control_section{
+	float:right;
+}
+
+
+
+
+#roomList{
+	float:right;
+	border:1px solid #0000FF;
+	background-color:grey;
+}
+#room_textbox
+{
+}
+#current_room{
+	border:1px solid #0000FF;
+	background-color:grey;	
+}
+
+#end_text {
+	color:white;
+}
+
+
+
+
+

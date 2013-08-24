@@ -25,9 +25,34 @@ require(
 */
         var myrequestAnimationFrame = utils.getRequestAnimationFrameFunc();
 
-		var timeOrigin=Date.now();
-		var serverTimeOrigin=0;
-		var serverTime=0;
+        var time = {
+        	serverTimeOrigin: 0,
+        	serverTimeSinceOrigin: 0,
+        	localClockTime: 0, // at last Frame Tiick
+        	sinceOrigin: 0,    // accumulated, and adjusted to track server time if connected.
+        	deltaTime: 0, // difference between server and localAccumulated at last server tick
+
+        	init: function(stime){
+         		console.log ("initializing time");
+
+	       		this.serverTimeOrigin=stime || 0;
+				this.serverTimeSinceOrigin=0;
+
+        		this.localClockTime=Date.now();
+        		this.sinceOrigin=0;
+        		this.deltaTime=0;
+        	},
+
+        	update: function(){
+        		var now = Date.now()
+        		var interval=now-this.localClockTime;  // interval to add to current time.sinceOrigin
+				this.localClockTime=now;
+				// adjust slightly to slowly track server time (to keep clients in synch)
+				this.sinceOrigin = this.sinceOrigin + interval*(1+this.deltaTime/10000);
+        	}
+        }
+
+
 		var myID=0;
 		var myRoom='';
 		var displayElements = [];  // list of all items to be displayed on the score
@@ -216,34 +241,22 @@ require(
 
 
 		//---------------------------------------------------------------------------
-		var serverPulseCount=0;
-		var timeShiftCorrection=0;
 		comm.registerCallback('metroPulse', function(data, src) {
-			serverTime=data;
-			// check server elapsed time again client elapsed time
-			//console.log("serverPulsecount " + serverPulseCount);
-			//console.log("on metropulse, server elapsed time = " + (serverTime-serverTimeOrigin) +  ", and client elapsed = "+ (Date.now() - timeOrigin ));
-			serverPulseCount++;
+			time.serverTimeSinceOrigin=data-time.serverTimeOrigin;
 
-
-			var t_myMachineTime = Date.now();
-			var tso = t_myMachineTime-timeOrigin;
-			var diff = (serverPulseCount - tso/1000); 
-
-			console.log("tso = " + tso + ", and serverPulseCount = " + serverPulseCount + ", diff is " + diff);
-
-			timeShiftCorrection=diff/600; // divided by the number of frames we want to distrubute the correction over
+			time.update();
+			time.deltaTime = time.serverTimeSinceOrigin - time.sinceOrigin;
+			console.log("Difference between server and local accumulated time = " + time.deltaTime);
 
 		});
 		//---------------------------------------------------------------------------
 		comm.registerCallback('startTime', function(data) {
 			console.log("server startTime = " + data[0] );
-			timeOrigin=Date.now();
 			lastSendTimeforCurrentEvent= -Math.random()*sendCurrentEventInterval; // so time-synched clients don't all send their countour chunks at the same time. 
-			serverTimeOrigin=data[0];
 			m_lastDisplayTick=0;
 			displayElements=[];		
-			serverPulseCount=0;
+
+			time.init(data[0]);
 		});
 		//---------------------------------------------------------------------------
 		// Just make a color for displaying future events from the client with the src ID
@@ -321,20 +334,20 @@ require(
 
 
 
-		var time2PxOLD=function(time, elapsedTime){ // time measured since timeOrigin
-			return nowLinePx+(time-elapsedTime)*pixelShiftPerMs;
+		var time2PxOLD=function(t, elapsedTime){ // time measured since timeOrigin
+			return nowLinePx+(t-elapsedTime)*pixelShiftPerMs;
 		}
-		var time2Px=function(time){ // time measured since timeOrigin
-			return nowLinePx+(time-t_sinceOrigin)*pixelShiftPerMs;
+		var time2Px=function(t){ // time measured since timeOrigin
+			return nowLinePx+(t-time.sinceOrigin)*pixelShiftPerMs;
 		}
 		var px2Time=function(px){  // relative to the now line
 			return (px-nowLinePx)/pixelShiftPerMs;
 		}
 
 		var lastDrawTime=0;
-		var t_sinceOrigin;
+
 		var nowishP = function(t){
-			if ((t > lastDrawTime) && (t <= t_sinceOrigin)) return true;
+			if ((t > lastDrawTime) && (t <= time.sinceOrigin)) return true;
 		}
 
 
@@ -348,11 +361,13 @@ require(
       	theCanvas.addEventListener("touchcancel", touch2Mouse.touchHandler, true);    
 
 
+      	time.init();
 		drawScreen(0);
 
 		var dispElmt;
 
 		function drawScreen(elapsedtime) {
+			//console.log("drawscreen at etime = " + elapsedtime);
 
 			context.clearRect(0, 0, theCanvas.width, theCanvas.height);
 
@@ -492,8 +507,9 @@ require(
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		function initiateScoreGesture(x, y){
 			var z = k_minLineThickness + k_maxLineThickness*leftSlider.value;
-			// time at the "now" line + the distance into the future or past 
-			var t = Date.now()-timeOrigin + px2Time(x);		
+			// time at the "now" line + the distance into the future or past 		
+			time.update();
+			var t = time.sinceOrigin + px2Time(x);	
 
 			var radioSelection=m_tabTab.currentSelection();
 			
@@ -647,12 +663,11 @@ require(
 
 
 		//	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		var t_myMachineTime;
-		var t_count=0;
+
 		var timerLoop = function(){
 
-			t_myMachineTime = Date.now();
-			t_sinceOrigin = t_myMachineTime-timeOrigin;
+			time.update();
+			var t_sinceOrigin = time.sinceOrigin;
 			
 			drawScreen(t_sinceOrigin);
 

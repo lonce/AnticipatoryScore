@@ -1,5 +1,5 @@
 define(
-	["soundbank", "config", "scoreEvents/generalScoreEvent"],
+	["soundbank", "config", "scoreEvents/generalScoreEvent", "../jslibs/vexflow-min.js"],
 	function (soundbank, config, generalScoreEvent) {
       return function (i_arg){
 
@@ -24,6 +24,7 @@ define(
                // Display the element
                if (this.head){
                   drawHead(ctx, dispPx);
+                  //console.log("draw head at x pixel " + dispPx);
                }
 
                if (this.drawID){
@@ -162,6 +163,62 @@ define(
                   ctx.fillStyle = 'black';
                   // The arg is an html element that has already been converted from svg, so this looks like shit
                   ctx.drawImage(i_arg, x, m_scoreEvent.track.min, 70, m_scoreEvent.track.max-m_scoreEvent.track.min);
+
+/*
+               //-------------------------------------------------------------------
+               // Try VexFlow ....
+
+               var newCanvas = document.createElement('canvas');
+               newCanvas.height=m_scoreEvent.track.max-m_scoreEvent.track.min;
+               newCanvas.width="70";
+
+
+               var renderer = new Vex.Flow.Renderer(newCanvas,
+                  Vex.Flow.Renderer.Backends.CANVAS);
+
+
+               var newCtx = renderer.getContext();
+               newCtx.scale(.4, .25);//m_scoreEvent.track.max-m_scoreEvent.track.min);
+
+               var stave = new Vex.Flow.Stave(10, 0-10, 70*2);
+
+               stave.setContext(newCtx).draw();
+
+               var notes = [
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "8d" }).addDotToAll(),
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "16" })
+                 ];
+
+               var notes2 = [
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "8d" }).addDotToAll(),
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "16" })
+                 ];
+
+               var notes3 = [
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "8d" }).addDotToAll(),
+                  new Vex.Flow.StaveNote({ keys: ["b/4"], duration: "16" })
+                 ];
+
+               var beam = new Vex.Flow.Beam(notes);
+               var beam2 = new Vex.Flow.Beam(notes2);
+               var beam3 = new Vex.Flow.Beam(notes3);
+
+               var all_notes = notes.concat(notes2).concat(notes3);
+
+               Vex.Flow.Formatter.FormatAndDraw(newCtx, stave, all_notes);
+               beam.setContext(newCtx).draw();
+               beam2.setContext(newCtx).draw();
+               beam3.setContext(newCtx).draw();
+
+
+               ctx.drawImage(newCanvas, x, m_scoreEvent.track.min);
+
+               //---------------------------------------------------------------------
+*/
+
+
+
+
            }
 
                ctx.beginPath();
